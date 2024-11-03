@@ -18,22 +18,25 @@ intents.members = True
 bot = commands.Bot(command_prefix=["?"], intents=intents)
 
 
-if webhook_url:  
+if webhook_url:
     webhook = SyncWebhook.from_url(webhook_url)
 else:
     webhook = None
 
 date = datetime.date.today()
 
+
 @bot.event
 async def on_ready():
     print(f"Logged in as {bot.user} (ID: {bot.user.id})")
     await bot.change_presence(
         activity=nextcord.Streaming(
-            name="/help | rlyaa.xyz", url="https://youtu.be/sVaQQRx6-es?si=WddbMqrjlhmF6kF8"  
+            name="/help | rlyaa.xyz",
+            url="https://youtu.be/sVaQQRx6-es?si=WddbMqrjlhmF6kF8",
         )
     )
     print("Bot is ready!")
+
 
 bot.load_extension("commands.moderation")
 bot.load_extension("commands.utility")

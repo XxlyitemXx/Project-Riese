@@ -4,18 +4,22 @@ from nextcord import SlashOption
 
 import sqlite3
 
+
 def create_afk_table():
-    conn = sqlite3.connect('reise_main.db')
+    conn = sqlite3.connect("reise_main.db")
     cursor = conn.cursor()
-    cursor.execute('''
+    cursor.execute(
+        """
         CREATE TABLE IF NOT EXISTS afk_status (
             user_id INTEGER PRIMARY KEY,
             server_id INTEGER,
             afk_message TEXT
         )
-    ''')
+    """
+    )
     conn.commit()
     conn.close()
+
 
 create_afk_table()
 
@@ -25,10 +29,14 @@ class AFK(commands.Cog):
         self.bot = bot
 
     @nextcord.slash_command(name="afk", description="Sets your AFK status")
-    async def afk(self, interaction: nextcord.Interaction, message: str = SlashOption(description="Your AFK message", required=False)):
+    async def afk(
+        self,
+        interaction: nextcord.Interaction,
+        message: str = SlashOption(description="Your AFK message", required=False),
+    ):
         user_id = interaction.user.id
         server_id = interaction.guild.id
-        conn = sqlite3.connect('reise_main.db')
+        conn = sqlite3.connect("reise_main.db")
         cursor = conn.cursor()
 
         if message:
@@ -48,6 +56,7 @@ class AFK(commands.Cog):
                 f"You are now AFK: `No reason provided.` :3"
             )
         conn.close()
+
 
 def setup(bot):
     bot.add_cog(AFK(bot))

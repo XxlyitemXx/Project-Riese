@@ -9,7 +9,9 @@ class Moderation(commands.Cog):
 
     @slash_command(name="ban", description="Bans a user from the server.")
     @commands.has_permissions(ban_members=True)
-    async def ban(self, interaction: Interaction, member: discord.Member, *, reason: str = None):
+    async def ban(
+        self, interaction: Interaction, member: discord.Member, *, reason: str = None
+    ):
         """
         Bans a user from the server.
 
@@ -24,17 +26,25 @@ class Moderation(commands.Cog):
         """
         try:
             if reason:
-                await member.send(f"You have been banned from **{interaction.guild.name}** for: {reason}")
+                await member.send(
+                    f"You have been banned from **{interaction.guild.name}** for: {reason}"
+                )
             else:
-                await member.send(f"You have been banned from **{interaction.guild.name}**.")
+                await member.send(
+                    f"You have been banned from **{interaction.guild.name}**."
+                )
         except discord.HTTPException:
-            await interaction.response.send(f"Could not DM {member.mention} about the ban, but they have been banned from the server.")
+            await interaction.response.send(
+                f"Could not DM {member.mention} about the ban, but they have been banned from the server."
+            )
         await member.ban(reason=reason)
         await interaction.response.send(f"{member.mention} has been banned.")
 
         @slash_command(name="unban", description="Unbans a user from the server.")
         @commands.has_permissions(ban_members=True)
-        async def unban(self, interaction: Interaction, user_id: str, *, reason: str = None):
+        async def unban(
+            self, interaction: Interaction, user_id: str, *, reason: str = None
+        ):
             """
             Unbans a user from the server.
 
@@ -61,7 +71,9 @@ class Moderation(commands.Cog):
 
     @slash_command(name="kick", description="Kicks a user from the server.")
     @commands.has_permissions(kick_members=True)
-    async def kick(self, interaction: Interaction, member: discord.Member, *, reason: str = None):
+    async def kick(
+        self, interaction: Interaction, member: discord.Member, *, reason: str = None
+    ):
         """
         Kicks a user from the server.
 
@@ -76,13 +88,20 @@ class Moderation(commands.Cog):
         """
         try:
             if reason:
-                await member.send(f"You have been banned from **{interaction.guild.name}** for: {reason}")
+                await member.send(
+                    f"You have been banned from **{interaction.guild.name}** for: {reason}"
+                )
             else:
-                await member.send(f"You have been banned from **{interaction.guild.name}**.")
+                await member.send(
+                    f"You have been banned from **{interaction.guild.name}**."
+                )
         except discord.HTTPException:
-            await interaction.response.send(f"Could not DM {member.mention} about the ban, but they have been banned from the server.")
+            await interaction.response.send(
+                f"Could not DM {member.mention} about the ban, but they have been banned from the server."
+            )
         await member.kick(reason=reason)
         await interaction.response.send(f"{member.mention} has been kicked.")
-        
+
+
 def setup(bot):
     bot.add_cog(Moderation(bot))
