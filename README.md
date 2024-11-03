@@ -1,4 +1,4 @@
-```markdown
+
 <a name="readme-top"></a>
 
 # Riese Discord Bot
