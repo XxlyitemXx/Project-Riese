@@ -47,7 +47,6 @@ class Moderation(commands.Cog):
         ):
         """
         Unbans a user from the server.
-
         Parameters
         ----------
         interaction: Interaction
