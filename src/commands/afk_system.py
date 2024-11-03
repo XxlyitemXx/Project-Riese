@@ -2,7 +2,6 @@ import nextcord
 from nextcord.ext import commands
 from nextcord import SlashOption
 
-# Database setup (using sqlite3 as an example)
 import sqlite3
 
 def create_afk_table():

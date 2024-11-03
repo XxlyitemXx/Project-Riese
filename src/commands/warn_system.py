@@ -21,9 +21,14 @@ class WarnCog(commands.Cog):
         ''')
         self.conn.commit()
 
-    @nextcord.slash_command(name="warn", description="Warn a user.")
+    @nextcord.slash_command(name="warn", description="Warn commands") 
+    async def warn(self, interaction: nextcord.Interaction):
+        pass 
+
+
+    @warn.subcommand(name="add", description="Warn a user.")
     @commands.has_permissions(kick_members=True)
-    async def warn(self, interaction: nextcord.Interaction, member: nextcord.Member, reason: str = None):
+    async def warn_add(self, interaction: nextcord.Interaction, member: nextcord.Member, reason: str = None):
         """
         Warns a user.
 
@@ -75,7 +80,7 @@ class WarnCog(commands.Cog):
             cursor.execute("DELETE FROM warns WHERE guild_id = ? AND user_id = ?", (guild_id, user_id))
             self.conn.commit()
 
-    @nextcord.slash_command(name="warn_remove", description="Remove a warning from a user.")
+    @warn.subcommand(name="remove", description="Remove a warning from a user.")
     @commands.has_permissions(kick_members=True)
     async def warn_remove(self, interaction: nextcord.Interaction, member: nextcord.Member):
         """
@@ -109,7 +114,7 @@ class WarnCog(commands.Cog):
 
         await interaction.response.send_message(f"Removed a warning from {member.mention}. They now have {warn_count} warning(s).", ephemeral=True)
 
-    @nextcord.slash_command(name="warn_list", description="Show the list of warned users.")
+    @warn.subcommand(name="list", description="Show the list of warned users.")
     @commands.has_permissions(kick_members=True)
     async def warn_list(self, interaction: nextcord.Interaction):
         """

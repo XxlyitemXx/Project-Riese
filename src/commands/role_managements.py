@@ -7,7 +7,11 @@ class role_managements(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @nextcord.slash_command(name="role_add", description="add role to user")
+    @nextcord.slash_command(name="role", description="Manage roles")
+    async def role(self, interaction: nextcord.Interaction):
+        pass
+
+    @role.subcommand(name="add", description="Add a role to a user")
     @commands.has_permissions(manage_roles=True)
     async def role_add(self, interaction: nextcord.Interaction, user: nextcord.Member, role: nextcord.Role):  
         if role.position >= interaction.user.top_role.position:
@@ -24,7 +28,7 @@ class role_managements(commands.Cog):
         await user.add_roles(role)
         await interaction.response.send_message(f"Added {role} to {user}!")
 
-    @nextcord.slash_command(name="role_remove", description="remove role from a user")
+    @role.subcommand(name="remove", description="Remove a role from a user")
     @commands.has_permissions(manage_roles=True)
     async def role_remove(self, interaction: nextcord.Interaction, user: nextcord.Member, role: nextcord.Role): 
         if role.position >= interaction.user.top_role.position:
@@ -40,7 +44,7 @@ class role_managements(commands.Cog):
         await user.remove_roles(role)  
         await interaction.response.send_message(f"Removed {role} from {user}")
 
-    @nextcord.slash_command(name="role_list", description="show the role of a user")
+    @role.subcommand(name="list", description="Show the roles of a user")
     async def role_list(self, interaction: nextcord.Interaction, user: nextcord.Member = None):  
         if user == None:
             user = interaction.user
