@@ -16,7 +16,6 @@ class BasicCommands(commands.Cog):
             "/say [content]": "Makes the bot say something.",
             "/invite": "Get the bot's invite link.",
             "/about": "Information about the bot.",
-            "/partner": "See our partner servers.",
             "/avatar [user]": "Get a user's avatar.",
             "/count_member": "View the member count of the server.",
             "/afk [message]": "Set your AFK status.",
@@ -31,14 +30,13 @@ class BasicCommands(commands.Cog):
         )
 
         admin_commands = {
-            "/role_add [user] [role]": "Add a role to a user.",
-            "/summon [user] [message]": "(Admin) DM a user and mention them.",
+            "/role add [user] [role]": "Add a role to a user.",
+            "/role remove [user] [role]": "Remove a role from a user.",
+            "/role list [user]": "show role list of a user.",
             "/kick [user] [reason]": "Kick a user.",
             "/ban [user] [reason]": "Ban a user.",
-            "/clear [amount]": "Clear messages.",
             "/unban [user_id]": "Unban a user.",
-            "/role_remove [user] [role]": "Remove a role from a user.",
-            "/nickname [user] [nickname]": "Change a user's nickname.",
+            "/clear [amount]": "Clear messages.",
         }
         if admin_commands:
             embed.add_field(

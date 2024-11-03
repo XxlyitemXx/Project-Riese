@@ -24,7 +24,7 @@ class Utility(commands.Cog):
         embed = nextcord.Embed(
             title="Invite Reise",
             color=interaction.user.color,
-            description="Here: https://discord.com/oauth2/authorize?client_id=1219307260493430854&permissions=570119417078&scope=bot",
+            description="Here: https://discord.com/oauth2/authorize?client_id=1219307260493430854&scope=bot%20identify%20guilds%20applications.commands&response_type=code&r ",
         )
         await interaction.response.send_message(embed=embed)
 
@@ -60,7 +60,6 @@ class Utility(commands.Cog):
                 deleted += 1
         await interaction.channel.send(f"!! Cleared `{deleted}` message(s).")
         print(f"Clear Log: {interaction.user}, {deleted}")
-    
-
+        
 def setup(bot):
     bot.add_cog(Utility(bot))

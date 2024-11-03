@@ -19,7 +19,6 @@ class MessageEvents(commands.Cog):
         conn.close()
 
         if result:
-            # Remove the user from the AFK status
             conn = sqlite3.connect('reise_main.db')
             cursor = conn.cursor()
             cursor.execute("DELETE FROM afk_status WHERE user_id=? AND server_id=?", (message.author.id, message.guild.id))
@@ -27,7 +26,6 @@ class MessageEvents(commands.Cog):
             conn.close()
             await message.channel.send(f"Welcome back, {message.author.mention}! You are no longer AFK. :3")
 
-        # Check if someone mentioned an AFK user
         for member in message.mentions:
             conn = sqlite3.connect('reise_main.db')
             cursor = conn.cursor()
@@ -36,7 +34,6 @@ class MessageEvents(commands.Cog):
             conn.close()
             if result:
                 await message.channel.send(f"{member.mention} is currently AFK: {result[0]}")
-
 
 def setup(bot):
     bot.add_cog(MessageEvents(bot))

@@ -45,6 +45,7 @@ bot.load_extension("events.message_events")
 bot.load_extension("commands.basic_commands")
 bot.load_extension("commands.warn_system")
 bot.load_extension("commands.afk_system")
+bot.load_extension("interactions.info")
 
 if __name__ == "__main__":
     bot.run(TOKEN)
