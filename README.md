@@ -12,6 +12,11 @@
 
 <br />
 <div align="center">
+<br />
+<div align="center">
+  <a href="https://github.com/xxlyitemxx/project-reise">
+    <img src="images/logo.png" alt="Logo" width="80" height="80">
+  </a>
 
 
 <h3 align="center">Riese Bot</h3>
