@@ -19,12 +19,12 @@
   <p align="center">
     A versatile Discord bot with moderation, utility, and welcome features.
     <br />
-    <a href="https://github.com/your_github_username/your_repo_name"><strong>Explore the Code »</strong></a>
+    <a href="https://github.com/xxlyitemxx/project-reise"><strong>Explore the Code »</strong></a>
     <br />
     <br />
-    <a href="https://github.com/your_github_username/your_repo_name/issues/new?labels=bug">Report Bug</a>
+    <a href="https://github.com/xxlyitemxx/project-reise/issues/new?labels=bug">Report Bug</a>
     ·
-    <a href="https://github.com/your_github_username/your_repo_name/issues/new?labels=enhancement">Request Feature</a>
+    <a href="https://github.com/xxlyitemxx/project-reise/issues/new?labels=enhancement">Request Feature</a>
   </p>
 </div>
 
@@ -88,11 +88,11 @@ Riese is a Discord bot designed to enhance your server's functionality.  It offe
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your_github_username/your_repo_name.git
+   git clone https://github.com/xxlyitemxx/project-reise.git
    ```
 2. Navigate to the project directory:
    ```bash
-   cd your_repo_name
+   cd project-reise
    ```
 3. Install the required libraries:
    ```bash
@@ -101,10 +101,10 @@ Riese is a Discord bot designed to enhance your server's functionality.  It offe
 
 ### Configuration
 
-1. Create a `config.yaml` file in the root directory.
+1. Create a `config.json` file in the root directory.
 2. Add your bot token and webhook URL:
 
-   ```yaml
+   ```json
    bot_token: "YOUR_BOT_TOKEN"
    webhook_url: "YOUR_WEBHOOK_URL"  # Optional
    ```
@@ -118,12 +118,6 @@ Riese Bot offers a variety of commands:
 
 * `/ping`: Checks the bot's latency.
 * `/say`: Makes the bot say something.
-* `/invite`: Get the bot's invite link.
-* `/about`: Information about the bot.
-* `/partner`: See our partner servers.
-* `/avatar`: Get a user's avatar.
-* `/count_messages`: Server's message count.
-* `/count_member`: View the member count.
 * `/afk`: Set your AFK status.
 * `/help`: Shows this help message.
 
@@ -131,25 +125,14 @@ Riese Bot offers a variety of commands:
 **Admin Commands:**
 
 * `/role_add`: Add a role to a user.
-* `/summon`:  DM a user and mention them (Admin only).
+* `/role_remove`: Remove a role from a user.
+* `/role_list`: Show role list of a user.
 * `/kick`: Kick a user.
 * `/ban`: Ban a user.
-* `/clear`: Clear messages.
 * `/unban`: Unban a user.
-* `/role_remove`: Remove a role from a user.
-* `/nickname`: Change a user's nickname.
-
-**Anti-Raid Commands:**
-
-* `/anti_raid`: Toggle anti-raid on/off (Admin only).
-* `/antiraid_disablechannel`: Disable anti-raid in a channel (Admin only).
-* `/warn_list`: See the warn list (Admin only).
-* `/remove_warn`: Remove a warn from a user (Admin only).
-
-**Welcome Commands:**
-
-* `/welcome_channel`: Set the welcome channel and message (Admin only).
-
+* `/warn`: warn a user
+* `/warn_remove` remove warn from a user
+* `warn_list` See the warn list
 
 <!-- CONTRIBUTING -->
 ## Contributing
@@ -160,26 +143,26 @@ Contributions are welcome!  Fork the repository, make your changes, and submit a
 <!-- LICENSE -->
 ## License
 
-Distributed under the MIT License. See `LICENSE.txt` for more information.
+Distributed under the MIT License. See `LICENSE` for more information.
 
 
 <!-- CONTACT -->
 ## Contact
 
 
-Project Link: [https://github.com/your_github_username/your_repo_name](https://github.com/your_github_username/your_repo_name)
+Project Link: [https://github.com/xxlyitemxx/project-reise](https://github.com/xxlyitemxx/project-reise)
 
 
 
 
 <!-- MARKDOWN LINKS & IMAGES -->
-[contributors-shield]: https://img.shields.io/github/contributors/your_github_username/your_repo_name.svg?style=for-the-badge
-[contributors-url]: https://github.com/your_github_username/your_repo_name/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/your_github_username/your_repo_name.svg?style=for-the-badge
-[forks-url]: https://github.com/your_github_username/your_repo_name/network/members
-[stars-shield]: https://img.shields.io/github/stars/your_github_username/your_repo_name.svg?style=for-the-badge
-[stars-url]: https://github.com/your_github_username/your_repo_name/stargazers
-[issues-shield]: https://img.shields.io/github/issues/your_github_username/your_repo_name.svg?style=for-the-badge
-[issues-url]: https://github.com/your_github_username/your_repo_name/issues
-[license-shield]: https://img.shields.io/github/license/your_github_username/your_repo_name.svg?style=for-the-badge
-[license-url]: https://github.com/your_github_username/your_repo_name/blob/master/LICENSE.txt
+[contributors-shield]: https://img.shields.io/github/contributors/xxlyitemxx/project-reise.svg?style=for-the-badge
+[contributors-url]: https://github.com/xxlyitemxx/project-reise/graphs/contributors
+[forks-shield]: https://img.shields.io/github/forks/xxlyitemxx/project-reise.svg?style=for-the-badge
+[forks-url]: https://github.com/xxlyitemxx/project-reise/network/members
+[stars-shield]: https://img.shields.io/github/stars/xxlyitemxx/project-reise.svg?style=for-the-badge
+[stars-url]: https://github.com/xxlyitemxx/project-reise/stargazers
+[issues-shield]: https://img.shields.io/github/issues/xxlyitemxx/project-reise.svg?style=for-the-badge
+[issues-url]: https://github.com/xxlyitemxx/project-reise/issues
+[license-shield]: https://img.shields.io/github/license/xxlyitemxx/project-reise.svg?style=for-the-badge
+[license-url]: https://github.com/xxlyitemxx/project-reise/blob/master/LICENSE.txt
