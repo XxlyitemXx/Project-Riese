@@ -48,11 +48,6 @@ class role_managements(commands.Cog):
                 ephemeral=True,
             )
             return
-        if role in user.roles:
-            await interaction.response.send_message(
-                f"'{user}' already has the '{role}' role.", ephemeral=True
-            )
-            return
         await user.remove_roles(role)
         await interaction.response.send_message(f"Removed {role} from {user}")
 
