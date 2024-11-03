@@ -10,8 +10,7 @@
 [![MIT License][license-shield]][license-url]
 
 
-<br />
-<div align="center">
+
 <br />
 <div align="center">
   <a href="https://github.com/xxlyitemxx/project-reise">
