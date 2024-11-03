@@ -40,34 +40,34 @@ class Moderation(commands.Cog):
         await member.ban(reason=reason)
         await interaction.response.send(f"{member.mention} has been banned.")
 
-        @slash_command(name="unban", description="Unbans a user from the server.")
-        @commands.has_permissions(ban_members=True)
-        async def unban(
-            self, interaction: Interaction, user_id: str, *, reason: str = None
+    @slash_command(name="unban", description="Unbans a user from the server.")
+    @commands.has_permissions(ban_members=True)
+    async def unban(
+        self, interaction: Interaction, user_id: str, *, reason: str = None
         ):
-            """
-            Unbans a user from the server.
+        """
+        Unbans a user from the server.
 
-            Parameters
-            ----------
-            interaction: Interaction
-                The interaction object.
-            user_id: str
-                The ID of the user to unban.
-            reason: str, optional
-                The reason for unbanning the user.
-            """
+        Parameters
+        ----------
+        interaction: Interaction
+            The interaction object.
+        user_id: str
+            The ID of the user to unban.
+        reason: str, optional
+            The reason for unbanning the user.
+        """
 
-            try:
-                user = await self.bot.fetch_user(int(user_id))
-                await interaction.guild.unban(user, reason=reason)
-                await interaction.response.send(f"{user.mention} has been unbanned.")
-            except ValueError:
-                await interaction.response.send("Invalid user ID.")
-            except discord.NotFound:
-                await interaction.response.send("User not found.")
-            except discord.HTTPException as e:
-                await interaction.response.send(f"An error occurred: {e}")
+        try:
+            user = await self.bot.fetch_user(int(user_id))
+            await interaction.guild.unban(user, reason=reason)
+            await interaction.response.send(f"{user.mention} has been unbanned.")
+        except ValueError:
+            await interaction.response.send("Invalid user ID.")
+        except discord.NotFound:
+            await interaction.response.send("User not found.")
+        except discord.HTTPException as e:
+            await interaction.response.send(f"An error occurred: {e}")
 
     @slash_command(name="kick", description="Kicks a user from the server.")
     @commands.has_permissions(kick_members=True)
