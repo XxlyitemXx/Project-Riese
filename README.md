@@ -128,15 +128,15 @@ Riese Bot offers a variety of commands:
 
 **Admin Commands:**
 
-* `/role_add`: Add a role to a user.
-* `/role_remove`: Remove a role from a user.
-* `/role_list`: Show role list of a user.
+* `/role add`: Add a role to a user.
+* `/role remove`: Remove a role from a user.
+* `/role list`: Show role list of a user.
 * `/kick`: Kick a user.
 * `/ban`: Ban a user.
 * `/unban`: Unban a user.
 * `/warn`: warn a user
-* `/warn_remove` remove warn from a user
-* `warn_list` See the warn list
+* `/warn remove` remove warn from a user
+* `/warn list` See the warn list
 
 <!-- CONTRIBUTING -->
 ## Contributing
