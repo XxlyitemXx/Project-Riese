@@ -46,6 +46,8 @@ bot.load_extension("commands.basic_commands")
 bot.load_extension("commands.warn_system")
 bot.load_extension("commands.afk_system")
 bot.load_extension("interactions.info")
+bot.load_extension("commands.slashgc")
+bot.load_extension("interactions.gc")
 
 if __name__ == "__main__":
     bot.run(TOKEN)

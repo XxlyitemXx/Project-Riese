@@ -12,10 +12,9 @@ class info(commands.Cog):
 
         joined_at = member.joined_at.strftime("%Y-%m-%d %H:%M:%S")
 
-        # Register Date
         created_at = member.created_at.strftime("%Y-%m-%d %H:%M:%S")
 
-        roles = [role.mention for role in member.roles[1:]]  # Exclude @everyone role
+        roles = [role.mention for role in member.roles[1:]] 
         roles_str = ", ".join(roles) if roles else "No roles"
 
         permissions = ", ".join(
