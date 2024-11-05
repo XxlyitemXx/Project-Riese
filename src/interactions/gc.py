@@ -3,7 +3,7 @@ from nextcord.ext import commands
 from nextcord import Interaction, SlashOption
 import sqlite3
 
-class GroupChatNormal(commands.Cog):  # Renamed the cog to avoid conflict
+class GroupChatNormal(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.gc_enabled = {}
@@ -243,8 +243,7 @@ class GroupChatNormal(commands.Cog):  # Renamed the cog to avoid conflict
                 await channel.set_permissions(member, read_messages=True, manage_channels=True)
                 action = "granted admin permissions in"
             else:
-                # For removing admin, you might want to define what permissions to keep
-                await channel.set_permissions(member, read_messages=True, manage_channels=False)  # Example: Remove manage_channels
+                await channel.set_permissions(member, read_messages=True, manage_channels=False)  
                 action = "removed admin permissions in"
 
             await ctx.send(f"{member.mention} has been {action} '{gc_name}'!")
