@@ -60,7 +60,7 @@ class Moderation(commands.Cog):
         try:
             user = await self.bot.fetch_user(int(user_id))
             await interaction.guild.unban(user, reason=reason)
-            await interaction.response.send(f"{user.mention} has been unbanned.")
+            await interaction.response.send_message(f"{user.mention} has been unbanned.")
         except ValueError:
             await interaction.response.send("Invalid user ID.")
         except discord.NotFound:
