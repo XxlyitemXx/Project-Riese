@@ -34,11 +34,11 @@ class Moderation(commands.Cog):
                     f"You have been banned from **{interaction.guild.name}**."
                 )
         except discord.HTTPException:
-            await interaction.response.send(
+            await interaction.response.send_message(
                 f"Could not DM {member.mention} about the ban, but they have been banned from the server."
             )
         await member.ban(reason=reason)
-        await interaction.response.send(f"{member.mention} has been banned.")
+        await interaction.response.send_message(f"{member.mention} has been banned.")
 
     @slash_command(name="unban", description="Unbans a user from the server.")
     @commands.has_permissions(ban_members=True)
