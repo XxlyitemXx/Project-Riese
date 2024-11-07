@@ -88,18 +88,18 @@ class Moderation(commands.Cog):
         try:
             if reason:
                 await member.send(
-                    f"You have been banned from **{interaction.guild.name}** for: {reason}"
+                    f"You have been kicked from **{interaction.guild.name}** for: {reason}"
                 )
             else:
                 await member.send(
-                    f"You have been banned from **{interaction.guild.name}**."
+                    f"You have been kicked from **{interaction.guild.name}**."
                 )
         except discord.HTTPException:
             await interaction.response.send(
                 f"Could not DM {member.mention} about the ban, but they have been banned from the server."
             )
         await member.kick(reason=reason)
-        await interaction.response.send(f"{member.mention} has been kicked.")
+        await interaction.response.send_message(f"{member.mention} has been kicked.")
 
 
 def setup(bot):
