@@ -11,6 +11,8 @@ class MessageEvents(commands.Cog):
     async def on_message(self, message):
         if message.author.bot:
             return
+        if message.content.startswith("?afk"):
+            return
 
         conn = sqlite3.connect('reise_main.db')
         cursor = conn.cursor()
