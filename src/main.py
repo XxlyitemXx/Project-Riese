@@ -50,7 +50,7 @@ bot.load_extension("commands.slashgc")
 bot.load_extension("interactions.gc")
 bot.load_extension("interactions.afk")
 bot.load_extension("interactions.clear")
-
+bot.load_extension("commands.slashstick")
 
 
 if __name__ == "__main__":
