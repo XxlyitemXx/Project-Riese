@@ -21,7 +21,7 @@
 <h3 align="center">Riese Bot</h3>
 
   <p align="center">
-    A versatile Discord bot with moderation, utility, and welcome features.
+    A versatile Discord bot with moderation, utility.
     <br />
     <a href="https://github.com/xxlyitemxx/project-reise"><strong>Explore the Code »</strong></a>
     <br />
