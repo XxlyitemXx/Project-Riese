@@ -19,12 +19,12 @@ class Utility(commands.Cog):
             f"Pong! Latency: {round(self.bot.latency * 1000)}ms"
         )
 
-    @nextcord.slash_command("invite", description="Invite Reise Into Your server!")
+    @nextcord.slash_command("invite", description="Invite Riese Into Your server!")
     async def invite(self, interaction: nextcord.Interaction):
         embed = nextcord.Embed(
             title="Invite Reise",
             color=interaction.user.color,
-            description="Here: https://discord.com/oauth2/authorize?client_id=1219307260493430854&scope=bot%20identify%20guilds%20applications.commands&response_type=code&r ",
+            description="Here: https://rlyaa.xyz/riese",
         )
         await interaction.response.send_message(embed=embed)
 

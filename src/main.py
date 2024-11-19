@@ -51,6 +51,8 @@ bot.load_extension("interactions.gc")
 bot.load_extension("interactions.afk")
 bot.load_extension("interactions.clear")
 bot.load_extension("commands.slashstick")
+bot.load_extension("events.on_join_events")
+bot.load_extension("commands.welcome")
 
 
 if __name__ == "__main__":

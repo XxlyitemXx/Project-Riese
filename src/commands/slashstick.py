@@ -184,11 +184,5 @@ class Slashstick(commands.Cog):
             # Handle database errors
             await interaction.response.send_message(f"An error occurred: {e}", ephemeral=True)
         
-    # Subcommand to toggle sticky messages (placeholder)
-    @sticky.subcommand(name="toggle", description="Toggle sticky messages")
-    async def toggle(self, interaction: nextcord.Interaction):
-        pass
-
-# Setup function to add cog to bot
 def setup(bot):
     bot.add_cog(Slashstick(bot))
