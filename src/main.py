@@ -53,7 +53,9 @@ bot.load_extension("interactions.clear")
 bot.load_extension("commands.slashstick")
 bot.load_extension("events.on_join_events")
 bot.load_extension("commands.welcome")
-
+bot.load_extension("AI.summarizer")
+bot.load_extension("AI.LenMinds")
+bot.load_extension("AI.AI_interaction")
 
 if __name__ == "__main__":
     bot.run(TOKEN)
