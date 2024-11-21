@@ -11,71 +11,95 @@ class BasicCommands(commands.Cog):
     async def help(self, interaction: nextcord.Interaction):
         embed = nextcord.Embed(title="Available Commands", color=nextcord.Color.blue())
 
+        # Basic Commands
         basic_commands = {
             "/ping": "Checks the bot's latency.",
-            "/say [content]": "Makes the bot say something.",
+            "/say [message]": "Makes the bot say something.",
             "/invite": "Get the bot's invite link.",
             "/about": "Information about the bot.",
             "/avatar [user]": "Get a user's avatar.",
-            "/count_member": "View the member count of the server.",
+            "/count member": "View server member count.",
             "/afk [message]": "Set your AFK status.",
+            "?afk [message]": "Alternative command for setting AFK status.",
+            "?w [member]": "Show detailed member information.",
+            "?sy [text]": "Summarize text with options.",
+            "?ask [question]": "Ask a question to the AI."
         }
         embed.add_field(
             name="Basic Commands",
-            value="\n".join(
-                f"`{command}`: {description}"
-                for command, description in basic_commands.items()
-            ),
-            inline=False,
+            value="\n".join(f"`{command}`: {description}" for command, description in basic_commands.items()),
+            inline=False
         )
 
-        admin_commands = {
-            "/role add [user] [role]": "Add a role to a user.",
-            "/role remove [user] [role]": "Remove a role from a user.",
-            "/role list [user]": "show role list of a user.",
-            "/kick [user] [reason]": "Kick a user.",
+        # Moderation Commands
+        moderation_commands = {
             "/ban [user] [reason]": "Ban a user.",
-            "/unban [user_id]": "Unban a user.",
-            "/clear [amount]": "Clear messages.",
+            "/unban [user_id] [reason]": "Unban a user.",
+            "/kick [user] [reason]": "Kick a user.",
+            "/warn add [user] [reason]": "Warn a user.",
+            "/warn remove [user]": "Remove warning from a user.",
+            "/warn list": "Show list of warned users.",
+            "/clear [amount]": "Clear specified number of messages.",
+            "?clear [amount]": "Alternative command for clearing messages."
         }
-        if admin_commands:
-            embed.add_field(
-                name="Admin Commands",
-                value="\n".join(
-                    f"`{command}`: {description}"
-                    for command, description in admin_commands.items()
-                ),
-                inline=False,
-            )
+        embed.add_field(
+            name="Moderation Commands",
+            value="\n".join(f"`{command}`: {description}" for command, description in moderation_commands.items()),
+            inline=False
+        )
 
-        anti_raid_commands = {
-            "/anti_raid": "Toggle anti-raid on/off.",
-            "/antiraid_disablechannel [channel]": "Disable anti-raid in a channel.",
-            "/warn_list": "See the warn list.",
-            "/remove_warn [user]": "Remove a warn from a user.",
+        # Role Management
+        role_commands = {
+            "/role add [user] [role]": "Add role to user.",
+            "/role remove [user] [role]": "Remove role from user.",
+            "/role list [user]": "Show user's roles."
         }
-        if anti_raid_commands:
-            embed.add_field(
-                name="Anti-Raid Commands",
-                value="\n".join(
-                    f"`{command}`: {description}"
-                    for command, description in anti_raid_commands.items()
-                ),
-                inline=False,
-            )
+        embed.add_field(
+            name="Role Management",
+            value="\n".join(f"`{command}`: {description}" for command, description in role_commands.items()),
+            inline=False
+        )
 
+        # Group Chat Commands
+        gc_commands = {
+            "/gc setup [gc-name]": "Create new group chat.",
+            "?gc setup [gc-name]": "Alternative command for creating group chat.",
+            "/gc add [gc-name] [member]": "Add member to group chat.",
+            "/gc remove [gc-name] [member]": "Remove member from group chat.",
+            "/gc delete [gc-name]": "Delete group chat.",
+            "/gc rename [gc-name] [new-name]": "Rename group chat.",
+            "/gc admin [gc-name] [member]": "Give admin permissions.",
+            "/gc leave [gc-name]": "Leave a group chat.",
+            "/gc toggle": "Toggle group chat creation for server."
+        }
+        embed.add_field(
+            name="Group Chat Commands",
+            value="\n".join(f"`{command}`: {description}" for command, description in gc_commands.items()),
+            inline=False
+        )
+
+        # Welcome System
         welcome_commands = {
-            "/welcome_channel [channel] [message]": "Set the welcome channel and message."
+            "/welcome setup [channel] [message]": "Setup welcome channel and message.",
+            "/welcome disable": "Disable welcome system."
         }
-        if welcome_commands:
-            embed.add_field(
-                name="Welcome Commands",
-                value="\n".join(
-                    f"`{command}`: {description}"
-                    for command, description in welcome_commands.items()
-                ),
-                inline=False,
-            )
+        embed.add_field(
+            name="Welcome System",
+            value="\n".join(f"`{command}`: {description}" for command, description in welcome_commands.items()),
+            inline=False
+        )
+
+        # Sticky Messages
+        sticky_commands = {
+            "/sticky set [message]": "Set a sticky message.",
+            "/sticky remove": "Remove sticky message.",
+            "/sticky list": "List all sticky messages."
+        }
+        embed.add_field(
+            name="Sticky Messages",
+            value="\n".join(f"`{command}`: {description}" for command, description in sticky_commands.items()),
+            inline=False
+        )
 
         await interaction.response.send_message(embed=embed, ephemeral=True)
 

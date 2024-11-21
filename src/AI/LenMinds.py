@@ -28,8 +28,12 @@ class LensMind(commands.Cog):
         genai.configure(api_key=api_key_gemini)
 
     @commands.command(name="lm", description="LensMind is a AI that can answer questions and help user with user's problems")
-    async def lensmind(self, ctx, *, question: str):
+    async def lensmind(self, ctx, *, question: str = None):
         try:
+            if not question:
+                await ctx.send("Please provide a question! Usage: `?lm <question>`")
+                return
+            
             if ctx.message.attachments:
                 image = ctx.message.attachments[0]
                 if image.content_type.startswith("image/"):
