@@ -2,6 +2,7 @@
 
 import nextcord
 from nextcord.ext import commands
+import datetime
 
 
 class role_managements(commands.Cog):
@@ -21,18 +22,31 @@ class role_managements(commands.Cog):
         role: nextcord.Role,
     ):
         if role.position >= interaction.user.top_role.position:
-            await interaction.response.send_message(
-                f"You can't assign a role higher than or equal to your top role. ",
-                ephemeral=True,
+            embed = nextcord.Embed(
+                title="Error",
+                description="You can't assign a role higher than or equal to your top role.",
+                color=nextcord.Color.red()
             )
+            await interaction.response.send_message(embed=embed, ephemeral=True)
             return
+        
         if role in user.roles:
-            await interaction.response.send_message(
-                f"`{user}` already has the `{role}` role.", ephemeral=True
+            embed = nextcord.Embed(
+                title="Error",
+                description=f"`{user}` already has the `{role}` role.",
+                color=nextcord.Color.orange()
             )
+            await interaction.response.send_message(embed=embed, ephemeral=True)
             return
+        
         await user.add_roles(role)
-        await interaction.response.send_message(f"Added {role} to {user}!")
+        embed = nextcord.Embed(
+            title="Role Added",
+            description=f"Added {role.mention} to {user.mention}",
+            color=nextcord.Color.green(),
+            timestamp=datetime.datetime.now()
+        )
+        await interaction.response.send_message(embed=embed)
 
     @role.subcommand(name="remove", description="Remove a role from a user")
     @commands.has_permissions(manage_roles=True)
@@ -43,13 +57,22 @@ class role_managements(commands.Cog):
         role: nextcord.Role,
     ):
         if role.position >= interaction.user.top_role.position:
-            await interaction.response.send_message(
-                f"you can't remove a role higher than or equal to your top role.",
-                ephemeral=True,
+            embed = nextcord.Embed(
+                title="Error",
+                description="You can't remove a role higher than or equal to your top role.",
+                color=nextcord.Color.red()
             )
+            await interaction.response.send_message(embed=embed, ephemeral=True)
             return
+        
         await user.remove_roles(role)
-        await interaction.response.send_message(f"Removed {role} from {user}")
+        embed = nextcord.Embed(
+            title="Role Removed",
+            description=f"Removed {role.mention} from {user.mention}",
+            color=nextcord.Color.green(),
+            timestamp=datetime.datetime.now()
+        )
+        await interaction.response.send_message(embed=embed)
 
     @role.subcommand(name="list", description="Show the roles of a user")
     async def role_list(

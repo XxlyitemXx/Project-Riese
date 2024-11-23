@@ -1,6 +1,7 @@
-import discord
-from discord.ext import commands
+import nextcord
+from nextcord.ext import commands
 from nextcord import Interaction, slash_command
+import datetime
 
 
 class Moderation(commands.Cog):
@@ -10,7 +11,7 @@ class Moderation(commands.Cog):
     @slash_command(name="ban", description="Bans a user from the server.")
     @commands.has_permissions(ban_members=True)
     async def ban(
-        self, interaction: Interaction, member: discord.Member, *, reason: str = None
+        self, interaction: Interaction, member: nextcord.Member, *, reason: str = None
     ):
         """
         Bans a user from the server.
@@ -25,20 +26,29 @@ class Moderation(commands.Cog):
             The reason for banning the member.
         """
         try:
-            if reason:
-                await member.send(
-                    f"You have been banned from **{interaction.guild.name}** for: {reason}"
-                )
-            else:
-                await member.send(
-                    f"You have been banned from **{interaction.guild.name}**."
-                )
-        except discord.HTTPException:
-            await interaction.response.send_message(
-                f"Could not DM {member.mention} about the ban, but they have been banned from the server."
+            embed = nextcord.Embed(
+                title="User Banned",
+                color=nextcord.Color.red(),
+                timestamp=datetime.datetime.now()
             )
-        await member.ban(reason=reason)
-        await interaction.response.send_message(f"{member.mention} has been banned.")
+            embed.add_field(name="Banned User", value=member.mention, inline=True)
+            embed.add_field(name="Banned By", value=interaction.user.mention, inline=True)
+            if reason:
+                embed.add_field(name="Reason", value=reason, inline=False)
+                await member.send(f"You have been banned from **{interaction.guild.name}** for: {reason}")
+            else:
+                embed.add_field(name="Reason", value="No reason provided", inline=False)
+                await member.send(f"You have been banned from **{interaction.guild.name}**.")
+            embed.set_image(url = "")
+            await member.ban(reason=reason)
+            await interaction.response.send_message(embed=embed)
+        except nextcord.HTTPException:
+            error_embed = nextcord.Embed(
+                title="Error",
+                description=f"Could not DM {member.mention} about the ban, but they have been banned from the server.",
+                color=nextcord.Color.orange()
+            )
+            await interaction.response.send_message(embed=error_embed)
 
     @slash_command(name="unban", description="Unbans a user from the server.")
     @commands.has_permissions(ban_members=True)
@@ -60,18 +70,44 @@ class Moderation(commands.Cog):
         try:
             user = await self.bot.fetch_user(int(user_id))
             await interaction.guild.unban(user, reason=reason)
-            await interaction.response.send_message(f"{user.mention} has been unbanned.")
+            
+            embed = nextcord.Embed(
+                title="User Unbanned",
+                color=nextcord.Color.green(),
+                timestamp=datetime.datetime.now()
+            )
+            embed.add_field(name="Unbanned User", value=user.mention, inline=True)
+            embed.add_field(name="Unbanned By", value=interaction.user.mention, inline=True)
+            if reason:
+                embed.add_field(name="Reason", value=reason, inline=False)
+            
+            await interaction.response.send_message(embed=embed)
         except ValueError:
-            await interaction.response.send("Invalid user ID.")
-        except discord.NotFound:
-            await interaction.response.send("User not found.")
-        except discord.HTTPException as e:
-            await interaction.response.send(f"An error occurred: {e}")
+            error_embed = nextcord.Embed(
+                title="Error",
+                description="Invalid user ID.",
+                color=nextcord.Color.red()
+            )
+            await interaction.response.send_message(embed=error_embed)
+        except nextcord.NotFound:
+            error_embed = nextcord.Embed(
+                title="Error",
+                description="User not found.",
+                color=nextcord.Color.red()
+            )
+            await interaction.response.send_message(embed=error_embed)
+        except nextcord.HTTPException as e:
+            error_embed = nextcord.Embed(
+                title="Error",
+                description=f"An error occurred: {e}",
+                color=nextcord.Color.red()
+            )
+            await interaction.response.send_message(embed=error_embed)
 
     @slash_command(name="kick", description="Kicks a user from the server.")
     @commands.has_permissions(kick_members=True)
     async def kick(
-        self, interaction: Interaction, member: discord.Member, *, reason: str = None
+        self, interaction: Interaction, member: nextcord.Member, *, reason: str = None
     ):
         """
         Kicks a user from the server.
@@ -86,20 +122,29 @@ class Moderation(commands.Cog):
             The reason for kicking the member.
         """
         try:
-            if reason:
-                await member.send(
-                    f"You have been kicked from **{interaction.guild.name}** for: {reason}"
-                )
-            else:
-                await member.send(
-                    f"You have been kicked from **{interaction.guild.name}**."
-                )
-        except discord.HTTPException:
-            await interaction.response.send(
-                f"Could not DM {member.mention} about the ban, but they have been banned from the server."
+            embed = nextcord.Embed(
+                title="User Kicked",
+                color=nextcord.Color.orange(),
+                timestamp=datetime.datetime.now()
             )
-        await member.kick(reason=reason)
-        await interaction.response.send_message(f"{member.mention} has been kicked.")
+            embed.add_field(name="Kicked User", value=member.mention, inline=True)
+            embed.add_field(name="Kicked By", value=interaction.user.mention, inline=True)
+            if reason:
+                embed.add_field(name="Reason", value=reason, inline=False)
+                await member.send(f"You have been kicked from **{interaction.guild.name}** for: {reason}")
+            else:
+                embed.add_field(name="Reason", value="No reason provided", inline=False)
+                await member.send(f"You have been kicked from **{interaction.guild.name}**.")
+            
+            await member.kick(reason=reason)
+            await interaction.response.send_message(embed=embed)
+        except nextcord.HTTPException:
+            error_embed = nextcord.Embed(
+                title="Error",
+                description=f"Could not DM {member.mention} about the kick, but they have been kicked from the server.",
+                color=nextcord.Color.orange()
+            )
+            await interaction.response.send_message(embed=error_embed)
 
 
 def setup(bot):
