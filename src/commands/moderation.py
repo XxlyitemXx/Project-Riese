@@ -38,7 +38,7 @@ class Moderation(commands.Cog):
                 await member.send(f"You have been banned from **{interaction.guild.name}** for: {reason}")
             else:
                 embed.add_field(name="Reason", value="No reason provided", inline=False)
-                await member.send(f"You have been banned from **{interaction.guild.name}**.")
+                await member.send(f"You have been banned from **{interaction.guild.name}**. by {interaction.user.mention}")
             embed.set_image(url = "")
             await member.ban(reason=reason)
             await interaction.response.send_message(embed=embed)
@@ -80,7 +80,10 @@ class Moderation(commands.Cog):
             embed.add_field(name="Unbanned By", value=interaction.user.mention, inline=True)
             if reason:
                 embed.add_field(name="Reason", value=reason, inline=False)
-            
+                await user.send(f"You have been unbanned from **{interaction.guild.name}** by {interaction.user.mention} for: {reason}")
+            else:
+                embed.add_field(name="Reason", value="No reason provided", inline=False)
+                await user.send(f"You have been unbanned from **{interaction.guild.name}** by {interaction.user.mention}.")
             await interaction.response.send_message(embed=embed)
         except ValueError:
             error_embed = nextcord.Embed(
@@ -131,7 +134,7 @@ class Moderation(commands.Cog):
             embed.add_field(name="Kicked By", value=interaction.user.mention, inline=True)
             if reason:
                 embed.add_field(name="Reason", value=reason, inline=False)
-                await member.send(f"You have been kicked from **{interaction.guild.name}** for: {reason}")
+                await member.send(f"You have been kicked from **{interaction.guild.name}** for: {reason} by {interaction.user.mention}!")
             else:
                 embed.add_field(name="Reason", value="No reason provided", inline=False)
                 await member.send(f"You have been kicked from **{interaction.guild.name}**.")

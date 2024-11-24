@@ -16,7 +16,7 @@ class Utility(commands.Cog):
             color=interaction.user.color,
             timestamp=datetime.datetime.now()
         )
-        embed.set_footer(text=f"Message by {interaction.user}", icon_url=interaction.user.avatar.url)
+        # embed.set_footer(text=f"Message by {interaction.user}", icon_url=interaction.user.avatar.url)
         await interaction.response.send_message("Message sent!", ephemeral=True)
         await interaction.channel.send(embed=embed)
 
