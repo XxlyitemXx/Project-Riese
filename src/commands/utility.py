@@ -2,6 +2,7 @@
 import nextcord
 from nextcord.ext import commands
 from nextcord import slash_command
+import datetime
 
 
 class Utility(commands.Cog):
@@ -10,14 +11,24 @@ class Utility(commands.Cog):
 
     @nextcord.slash_command(name="say", description="Makes Reise say something")
     async def say(self, interaction: nextcord.Interaction, message: str):
-        await interaction.response.send_message(message, ephemeral=True)
-        await interaction.channel.send(message)
+        embed = nextcord.Embed(
+            description=message,
+            color=interaction.user.color,
+            timestamp=datetime.datetime.now()
+        )
+        embed.set_footer(text=f"Message by {interaction.user}", icon_url=interaction.user.avatar.url)
+        await interaction.response.send_message("Message sent!", ephemeral=True)
+        await interaction.channel.send(embed=embed)
 
     @nextcord.slash_command(name="ping", description="Checks bot latency")
     async def ping(self, interaction: nextcord.Interaction):
-        await interaction.response.send_message(
-            f"Pong! Latency: {round(self.bot.latency * 1000)}ms"
+        embed = nextcord.Embed(
+            title="🏓 Pong!",
+            description=f"Latency: `{round(self.bot.latency * 1000)}ms`",
+            color=nextcord.Color.green(),
+            timestamp=datetime.datetime.now()
         )
+        await interaction.response.send_message(embed=embed)
 
     @nextcord.slash_command("invite", description="Invite Riese Into Your server!")
     async def invite(self, interaction: nextcord.Interaction):
