@@ -62,10 +62,17 @@ class AI_interaction(commands.Cog):
             )
 
             class ResponseButtons(nextcord.ui.View):
-                def __init__(self, original_question, model):
+                def __init__(self, original_question, model, author_id):
                     super().__init__(timeout=180)
                     self.original_question = original_question
                     self.model = model
+                    self.author_id = author_id
+
+                async def interaction_check(self, interaction: nextcord.Interaction) -> bool:
+                    if interaction.user.id != self.author_id:
+                        await interaction.response.send_message("This button is not for you!", ephemeral=True)
+                        return False
+                    return True
 
                 @nextcord.ui.button(label="Shorter", style=nextcord.ButtonStyle.gray)
                 async def shorter(
@@ -159,7 +166,7 @@ class AI_interaction(commands.Cog):
                     )
                     return new_embed
 
-            view = ResponseButtons(question, self.model)
+            view = ResponseButtons(question, self.model, ctx.author.id)
             await ctx.send(embed=embed, view=view)
 
         except Exception as e:
