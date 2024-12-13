@@ -69,7 +69,7 @@ class Utility(commands.Cog):
             async for message in interaction.channel.history(limit=amount):
                 await message.delete()
                 deleted += 1
-        await interaction.channel.send(f"!! Cleared `{deleted}` message(s).")
+        await interaction.channel.send(f"Cleared `{amount}` message(s) By {interaction.user.mention}.")
         print(f"Clear Log: {interaction.user}, {deleted}")
         
 def setup(bot):
