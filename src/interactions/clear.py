@@ -23,8 +23,7 @@ class clear(commands.Cog):
                 await message.delete()
                 deleted += 1
 
-        await ctx.send(f"Cleared `{deleted}` message(s).")
-        print(f"Clear Log: {ctx.author}, {deleted}")
+        await ctx.send(f"Cleared `{deleted}` message(s). by {ctx.author.mention}")
 
 def setup(bot):
     bot.add_cog(clear(bot))
