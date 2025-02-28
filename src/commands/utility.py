@@ -264,7 +264,7 @@ class Utility(commands.Cog):
         self.save_triggers()
         return True
         
-    @nextcord.Cog.listener()
+    @commands.Cog.listener()
     async def on_message(self, message):
         """Check messages for trigger words"""
         # Don't respond to bots
