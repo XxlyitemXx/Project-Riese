@@ -57,5 +57,6 @@ bot.load_extension("AI.summarizer")
 bot.load_extension("AI.LenMinds")
 bot.load_extension("AI.AI_interaction")
 
+
 if __name__ == "__main__":
     bot.run(TOKEN)
