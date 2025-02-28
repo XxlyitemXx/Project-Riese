@@ -285,11 +285,16 @@ class Utility(commands.Cog):
         
         # Check each trigger word
         for trigger, data in self.triggers[guild_id].items():
+            # Skip disabled triggers
             if not data.get("enabled", True):
                 continue
                 
             if trigger.lower() in content:
-                await message.channel.send(data["response"])
+                # Check if should reply or just send a message
+                if data.get("should_reply", False):
+                    await message.reply(data["response"])
+                else:
+                    await message.channel.send(data["response"])
                 break
 
 
@@ -374,6 +379,12 @@ class TriggerManageView(ui.View):
             self.add_item(ui.Button(label="Disable", style=nextcord.ButtonStyle.secondary, emoji="🔴", custom_id="disable"))
         else:
             self.add_item(ui.Button(label="Enable", style=nextcord.ButtonStyle.success, emoji="🟢", custom_id="enable"))
+        
+        # Add reply mode status
+        is_reply_mode = cog.triggers[guild_id][trigger_word].get("should_reply", False)
+        reply_label = "Switch to Message Mode" if is_reply_mode else "Switch to Reply Mode"
+        reply_emoji = "💬" if is_reply_mode else "↩️"
+        self.add_item(ui.Button(label=reply_label, style=nextcord.ButtonStyle.primary, emoji=reply_emoji, custom_id="toggle_reply"))
             
     @ui.button(label="Remove", style=nextcord.ButtonStyle.danger, emoji="🗑️")
     async def remove_button(self, button: ui.Button, interaction: nextcord.Interaction):
@@ -394,7 +405,7 @@ class TriggerManageView(ui.View):
             TriggerEditModal(self.cog, self.guild_id, self.trigger_word, trigger_data["response"])
         )
         
-    # Custom button handler for enable/disable since the button changes dynamically
+    # Custom button handler for enable/disable and reply toggle since the buttons change dynamically
     async def interaction_check(self, interaction: nextcord.Interaction) -> bool:
         if interaction.data["custom_id"] == "enable":
             success = await self.cog.toggle_trigger(interaction, self.guild_id, self.trigger_word, True)
@@ -419,6 +430,26 @@ class TriggerManageView(ui.View):
                 await interaction.response.send_message(embed=embed, ephemeral=True)
                 # Refresh the management view
                 await self.cog.trigger_manage(interaction, self.trigger_word)
+                
+        elif interaction.data["custom_id"] == "toggle_reply":
+            trigger_data = self.cog.triggers[self.guild_id][self.trigger_word]
+            current_setting = trigger_data.get("should_reply", False)
+            
+            # Toggle it
+            trigger_data["should_reply"] = not current_setting
+            self.cog.save_triggers()
+            
+            # Show confirmation
+            new_state = "Reply to messages" if trigger_data["should_reply"] else "Send as new messages"
+            embed = nextcord.Embed(
+                title="🔄 Reply Mode Updated",
+                description=f"Trigger `{self.trigger_word}` will now: **{new_state}**",
+                color=nextcord.Color.green()
+            )
+            await interaction.response.send_message(embed=embed, ephemeral=True)
+            
+            # Refresh the view
+            await self.cog.trigger_manage(interaction, self.trigger_word)
                 
         return True
 
@@ -493,6 +524,7 @@ class TriggerAddModal(ui.Modal):
         self.cog.triggers[guild_id][trigger] = {
             "response": response,
             "enabled": True,
+            "should_reply": False,  # Default to sending new messages
             "created_by": interaction.user.id,
             "created_at": datetime.datetime.now().isoformat()
         }
@@ -508,10 +540,13 @@ class TriggerAddModal(ui.Modal):
         )
         embed.add_field(name="Trigger", value=f"`{trigger}`", inline=False)
         embed.add_field(name="Response", value=response[:1024], inline=False)
+        embed.add_field(name="Reply Mode", value="🔄 Sends as new message (default)", inline=False)
         embed.set_footer(text=f"Created by {interaction.user}", icon_url=interaction.user.avatar.url)
         
-        await interaction.response.send_message(embed=embed)
-        
+        # Add view with toggle reply button
+        view = TriggerAddedView(self.cog, guild_id, trigger)
+        await interaction.response.send_message(embed=embed, view=view)
+
 
 class TriggerEditModal(ui.Modal):
     def __init__(self, cog, guild_id, trigger_word, current_response):
@@ -540,6 +575,10 @@ class TriggerEditModal(ui.Modal):
         self.cog.triggers[self.guild_id][self.trigger_word]["edited_at"] = datetime.datetime.now().isoformat()
         self.cog.save_triggers()
         
+        # Get current reply mode
+        is_reply_mode = self.cog.triggers[self.guild_id][self.trigger_word].get("should_reply", False)
+        reply_status = "Replies to message" if is_reply_mode else "Sends as new message"
+        
         embed = nextcord.Embed(
             title="✅ Trigger Updated",
             description=f"Successfully updated response for: `{self.trigger_word}`",
@@ -547,6 +586,7 @@ class TriggerEditModal(ui.Modal):
             timestamp=datetime.datetime.now()
         )
         embed.add_field(name="New Response", value=new_response[:1024], inline=False)
+        embed.add_field(name="Mode", value=f"🔄 {reply_status}", inline=False)
         embed.set_footer(text=f"Edited by {interaction.user}", icon_url=interaction.user.avatar.url)
         
         await interaction.response.send_message(embed=embed)
@@ -554,6 +594,33 @@ class TriggerEditModal(ui.Modal):
         # Also refresh the management view
         await self.cog.trigger_manage(interaction, self.trigger_word)
         
+
+class TriggerAddedView(ui.View):
+    def __init__(self, cog, guild_id, trigger_word):
+        super().__init__(timeout=60)
+        self.cog = cog
+        self.guild_id = guild_id
+        self.trigger_word = trigger_word
         
+    @ui.button(label="Set to Reply Mode", style=nextcord.ButtonStyle.primary, emoji="↩️")
+    async def set_reply_button(self, button: ui.Button, interaction: nextcord.Interaction):
+        # Update to reply mode
+        self.cog.triggers[self.guild_id][self.trigger_word]["should_reply"] = True
+        self.cog.save_triggers()
+        
+        embed = nextcord.Embed(
+            title="🔄 Reply Mode Updated",
+            description=f"Trigger `{self.trigger_word}` will now reply to messages instead of sending new ones",
+            color=nextcord.Color.green()
+        )
+        await interaction.response.send_message(embed=embed, ephemeral=True)
+        self.stop()
+        
+    @ui.button(label="Manage Trigger", style=nextcord.ButtonStyle.secondary, emoji="⚙️")
+    async def manage_button(self, button: ui.Button, interaction: nextcord.Interaction):
+        await self.cog.trigger_manage(interaction, self.trigger_word)
+        self.stop()
+
+
 def setup(bot):
     bot.add_cog(Utility(bot))
