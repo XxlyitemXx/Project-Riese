@@ -144,7 +144,12 @@ class Utility(commands.Cog):
     @slash_command(name="trigger", description="Manage trigger words")
     async def trigger(self, interaction: nextcord.Interaction):
         """Base command for trigger word management"""
-        # Send a management panel with options
+        # This won't be accessible directly since there are subcommands
+        pass
+        
+    @trigger.subcommand(name="dashboard", description="View trigger management dashboard")
+    async def trigger_dashboard(self, interaction: nextcord.Interaction):
+        """Display the trigger word management dashboard"""
         embed = nextcord.Embed(
             title="⚙️ Trigger Word Management",
             description="Manage trigger words for this server",
