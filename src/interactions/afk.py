@@ -6,6 +6,8 @@ import datetime
 def create_afk_table():
     conn = sqlite3.connect("reise_main.db")
     cursor = conn.cursor()
+    
+    # Create the table if it doesn't exist
     cursor.execute(
         """
         CREATE TABLE IF NOT EXISTS afk_status (
@@ -16,6 +18,15 @@ def create_afk_table():
         )
     """
     )
+    
+    # Check if timestamp column exists, if not add it
+    try:
+        cursor.execute("SELECT timestamp FROM afk_status LIMIT 1")
+    except sqlite3.OperationalError:
+        # Column doesn't exist, so add it
+        cursor.execute("ALTER TABLE afk_status ADD COLUMN timestamp TEXT")
+        print("Added missing timestamp column to afk_status table")
+    
     conn.commit()
     conn.close()
 
@@ -29,7 +40,7 @@ class afk(commands.Cog):
     async def afk(self, ctx, *, message: str = None): 
         user_id = ctx.author.id
         server_id = ctx.guild.id
-        timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        timestamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
         conn = sqlite3.connect("reise_main.db")
         cursor = conn.cursor()
 
@@ -42,7 +53,7 @@ class afk(commands.Cog):
         embed = nextcord.Embed(
             title=f"{afk_emoji} AFK Status Set",
             color=ctx.author.color or nextcord.Color.blue(),
-            timestamp=datetime.datetime.now()
+            timestamp=datetime.datetime.now(datetime.timezone.utc)
         )
         embed.set_thumbnail(url=ctx.author.display_avatar.url)
         
