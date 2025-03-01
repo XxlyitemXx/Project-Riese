@@ -9,27 +9,39 @@ class BasicCommands(commands.Cog):
 
     @nextcord.slash_command(name="help", description="Show available commands")
     async def help(self, interaction: nextcord.Interaction):
+        embed = await self._create_help_embed(interaction.user, interaction.guild)
+        await interaction.response.send_message(embed=embed, ephemeral=True)
+        
+    @commands.command(name="help", description="Show available commands")
+    async def help_prefix(self, ctx):
+        """Show available commands"""
+        embed = await self._create_help_embed(ctx.author, ctx.guild)
+        await ctx.send(embed=embed)
+        
+    async def _create_help_embed(self, user, guild):
+        """Create the help embed with all commands"""
         embed = nextcord.Embed(
             title="✨ Available Commands ✨", 
             description="Here's everything you can do with Reise!", 
             color=nextcord.Color.blue()
         )
         embed.set_thumbnail(url=self.bot.user.avatar.url)
-        embed.set_footer(text=f"Requested by {interaction.user}", icon_url=interaction.user.avatar.url)
+        embed.set_footer(text=f"Requested by {user}", icon_url=user.avatar.url)
 
         # Basic Commands
         basic_commands = {
             "/ping": "🏓 Checks the bot's latency.",
             "/say [message]": "📢 Makes the bot say something.",
             "/invite": "🔗 Get the bot's invite link.",
-            "/about": "ℹ️ Information about the bot.",
+            "/about me": "ℹ️ Information about the bot.",
             "/avatar [user]": "🖼️ Get a user's avatar.",
             "/count member": "👥 View server member count.",
             "/afk [message]": "💤 Set your AFK status.",
             "?afk [message]": "💤 Alternative command for setting AFK status.",
             "?w [member]": "👤 Show detailed member information.",
             "?sy [text]": "📝 Summarize text with options.",
-            "?ask [question]": "🤖 Ask a question to the AI."
+            "?ask [question]": "🤖 Ask a question to the AI.",
+            "?help": "📚 Show this help message."
         }
         embed.add_field(
             name="🧰 Basic Commands",
@@ -106,8 +118,44 @@ class BasicCommands(commands.Cog):
             value="\n".join(f"`{command}`: {description}" for command, description in sticky_commands.items()),
             inline=False
         )
-
-        await interaction.response.send_message(embed=embed, ephemeral=True)
+        
+        # Trigger System
+        trigger_commands = {
+            "/trigger dashboard": "🎛️ Manage trigger words dashboard.",
+            "/trigger add": "➕ Add new trigger words.",
+            "/trigger list": "📋 List all trigger words.",
+            "/trigger manage [word]": "⚙️ Manage specific trigger word."
+        }
+        embed.add_field(
+            name="🔄 Trigger System",
+            value="\n".join(f"`{command}`: {description}" for command, description in trigger_commands.items()),
+            inline=False
+        )
+        
+        # Admin Commands (only shown to bot owner)
+        try:
+            application_info = await self.bot.application_info()
+            if user.id == application_info.owner.id:
+                admin_commands = {
+                    "/admin extension load [name]": "🔌 Load a bot extension.",
+                    "/admin extension unload [name]": "🔌 Unload a bot extension.",
+                    "/admin extension reload [name]": "🔄 Reload a bot extension.",
+                    "/admin extension list": "📋 List all extensions.",
+                    "/admin update": "🔄 Update bot from GitHub.",
+                    "/admin restart": "🔄 Restart the bot.",
+                    "/admin owner [id]": "👑 Set bot owner ID.",
+                    "/admin check_owner": "👑 Check current owner settings.",
+                    "/admin dashboard": "🎛️ Open admin dashboard."
+                }
+                embed.add_field(
+                    name="🛠️ Admin Commands (Owner Only)",
+                    value="\n".join(f"`{command}`: {description}" for command, description in admin_commands.items()),
+                    inline=False
+                )
+        except:
+            pass 
+        
+        return embed
 
     @slash_command("avatar", description="show avatar of a user")
     async def avatar(self, interaction: nextcord.Interaction, user: nextcord.Member = None):
