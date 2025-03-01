@@ -194,7 +194,7 @@ class AI_interaction(commands.Cog):
         # Create confirmation embed
         embed = nextcord.Embed(
             title="Start AI Chat",
-            description="By starting this chat, you agree that your messages will be stored until the chat is deactivated. The AI will respond to all messages in this channel.",
+            description="By starting this chat, you agree that your messages will be stored. The AI will respond to all messages in this channel.",
             color=0x00FF00,
             timestamp=datetime.datetime.now()
         )
