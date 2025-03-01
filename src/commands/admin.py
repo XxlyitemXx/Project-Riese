@@ -53,7 +53,7 @@ def is_owner():
             )
             return False
         return True
-    return nextcord.check(predicate)
+    return commands.check(predicate)
 
 
 class Admin(commands.Cog):

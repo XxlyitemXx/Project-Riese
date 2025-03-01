@@ -56,7 +56,7 @@ bot.load_extension("commands.welcome")
 bot.load_extension("AI.summarizer")
 bot.load_extension("AI.LenMinds")
 bot.load_extension("AI.AI_interaction")
-
+bot.load_extension('commands.admin')
 
 if __name__ == "__main__":
     bot.run(TOKEN)
