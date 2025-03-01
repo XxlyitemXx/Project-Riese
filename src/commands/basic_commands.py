@@ -1,7 +1,8 @@
 import nextcord
 from nextcord.ext import commands
 from nextcord import slash_command
-
+from assets.utils.config_loader import load_config
+config = load_config()
 
 class BasicCommands(commands.Cog):
     def __init__(self, bot):
@@ -134,8 +135,8 @@ class BasicCommands(commands.Cog):
         
         # Admin Commands (only shown to bot owner)
         try:
-            application_info = await self.bot.application_info()
-            if user.id == application_info.owner.id:
+            owner = config.get('owner_id')
+            if user.id == owner:
                 admin_commands = {
                     "/admin extension load [name]": "🔌 Load a bot extension.",
                     "/admin extension unload [name]": "🔌 Unload a bot extension.",
@@ -177,7 +178,6 @@ class BasicCommands(commands.Cog):
     async def member(self, interaction: nextcord.Interaction):
         count_member = interaction.guild.member_count
         
-        # Determine emoji based on member count
         if count_member < 50:
             size_emoji = "🏠"  # Small server
             size_text = "Cozy community"
@@ -196,32 +196,41 @@ class BasicCommands(commands.Cog):
         
         embed.add_field(name="👥 Server Size", value=size_text, inline=False)
         
-        # Add online status counts if available
-        try:
-            # Fix the status checks using proper comparison
-            online = sum(1 for m in interaction.guild.members if str(m.status) == "online")
-            idle = sum(1 for m in interaction.guild.members if str(m.status) == "idle") 
-            dnd = sum(1 for m in interaction.guild.members if str(m.status) == "dnd")
-            offline = sum(1 for m in interaction.guild.members if str(m.status) == "offline")
+        if hasattr(interaction.guild, "presences") and interaction.guild.presences:
+            online = 0
+            idle = 0
+            dnd = 0
+            offline = 0
             
-            # Ensure counts match the total by taking invisible/unknown status into account
-            total_accounted = online + idle + dnd + offline
-            if total_accounted < count_member:
-                unknown = count_member - total_accounted
-                status_info = f"🟢 Online: {online}\n🟡 Idle: {idle}\n🔴 DND: {dnd}\n⚫ Offline: {offline}\n🔘 Unknown: {unknown}"
-            else:
-                status_info = f"🟢 Online: {online}\n🟡 Idle: {idle}\n🔴 DND: {dnd}\n⚫ Offline: {offline}"
-                
+            for member in interaction.guild.members:
+                if member.status == nextcord.Status.online:
+                    online += 1
+                elif member.status == nextcord.Status.idle:
+                    idle += 1
+                elif member.status == nextcord.Status.dnd:
+                    dnd += 1
+                else:
+                    offline += 1
+            
+            status_info = f"🟢 Online: {online}\n🟡 Idle: {idle}\n🔴 DND: {dnd}\n⚫ Offline: {offline}"
             embed.add_field(name="📊 Status Breakdown", value=status_info, inline=False)
-        except Exception as e:
-            # Add error info for debugging
-            embed.add_field(name="📊 Status Info", value="Status information unavailable", inline=False)
-            print(f"Status check error: {e}")
+            
+            if interaction.bot.intents.presences:
+                embed.set_footer(text=f"Requested by {interaction.user}", icon_url=interaction.user.avatar.url)
+            else:
+                embed.set_footer(text=f"Status counts may be inaccurate - presence intent is disabled | Requested by {interaction.user}", 
+                                icon_url=interaction.user.avatar.url)
+        else:
+            embed.add_field(
+                name="📊 Status Info", 
+                value="⚠️ Status breakdown unavailable - enable presence intents for accurate status counts", 
+                inline=False
+            )
+            embed.set_footer(text=f"Requested by {interaction.user}", icon_url=interaction.user.avatar.url)
             
         if interaction.guild.icon:
             embed.set_thumbnail(url=interaction.guild.icon.url)
         
-        embed.set_footer(text=f"Requested by {interaction.user}", icon_url=interaction.user.avatar.url)
         await interaction.response.send_message(embed=embed)
 
 
