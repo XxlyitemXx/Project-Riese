@@ -14,12 +14,13 @@ class info(commands.Cog):
         joined_at = member.joined_at.strftime("%Y-%m-%d %H:%M:%S")
         created_at = member.created_at.strftime("%Y-%m-%d %H:%M:%S")
 
-        # Calculate account age
-        account_age = datetime.datetime.now() - member.created_at
+        # Calculate account age - using timezone-aware now()
+        now = datetime.datetime.now(datetime.timezone.utc)
+        account_age = now - member.created_at
         account_age_days = account_age.days
         
-        # Calculate server membership duration
-        server_time = datetime.datetime.now() - member.joined_at
+        # Calculate server membership duration - using timezone-aware now()
+        server_time = now - member.joined_at
         server_time_days = server_time.days
 
         roles = [role.mention for role in member.roles[1:]] 
@@ -48,7 +49,7 @@ class info(commands.Cog):
             title=f"{status_emoji} Member Information: {member.name}",
             description=f"Detailed information about {member.mention}",
             color=member.color,
-            timestamp=datetime.datetime.now()
+            timestamp=now  # Use the same timezone-aware datetime
         )
         embed.set_thumbnail(url=member.display_avatar.url)
         
