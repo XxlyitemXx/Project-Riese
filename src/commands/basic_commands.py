@@ -198,15 +198,25 @@ class BasicCommands(commands.Cog):
         
         # Add online status counts if available
         try:
-            online = sum(1 for m in interaction.guild.members if m.status.online)
-            idle = sum(1 for m in interaction.guild.members if m.status.idle)
-            dnd = sum(1 for m in interaction.guild.members if m.status.dnd)
-            offline = count_member - online - idle - dnd
+            # Fix the status checks using proper comparison
+            online = sum(1 for m in interaction.guild.members if str(m.status) == "online")
+            idle = sum(1 for m in interaction.guild.members if str(m.status) == "idle") 
+            dnd = sum(1 for m in interaction.guild.members if str(m.status) == "dnd")
+            offline = sum(1 for m in interaction.guild.members if str(m.status) == "offline")
             
-            status_info = f"🟢 Online: {online}\n🟡 Idle: {idle}\n🔴 DND: {dnd}\n⚫ Offline: {offline}"
+            # Ensure counts match the total by taking invisible/unknown status into account
+            total_accounted = online + idle + dnd + offline
+            if total_accounted < count_member:
+                unknown = count_member - total_accounted
+                status_info = f"🟢 Online: {online}\n🟡 Idle: {idle}\n🔴 DND: {dnd}\n⚫ Offline: {offline}\n🔘 Unknown: {unknown}"
+            else:
+                status_info = f"🟢 Online: {online}\n🟡 Idle: {idle}\n🔴 DND: {dnd}\n⚫ Offline: {offline}"
+                
             embed.add_field(name="📊 Status Breakdown", value=status_info, inline=False)
-        except:
-            pass  # Skip if status info isn't available
+        except Exception as e:
+            # Add error info for debugging
+            embed.add_field(name="📊 Status Info", value="Status information unavailable", inline=False)
+            print(f"Status check error: {e}")
             
         if interaction.guild.icon:
             embed.set_thumbnail(url=interaction.guild.icon.url)
