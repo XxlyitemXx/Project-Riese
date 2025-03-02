@@ -178,6 +178,7 @@ class BasicCommands(commands.Cog):
     async def member(self, interaction: nextcord.Interaction):
         count_member = interaction.guild.member_count
         
+        # Determine emoji based on member count
         if count_member < 50:
             size_emoji = "🏠"  # Small server
             size_text = "Cozy community"
@@ -196,41 +197,76 @@ class BasicCommands(commands.Cog):
         
         embed.add_field(name="👥 Server Size", value=size_text, inline=False)
         
-        if hasattr(interaction.guild, "presences") and interaction.guild.presences:
-            online = 0
-            idle = 0
-            dnd = 0
-            offline = 0
+        # Initialize counters
+        online = 0
+        idle = 0
+        dnd = 0
+        offline = 0
+        
+        # Add debug info
+        debug_info = []
+        
+        # Check if presences intent is enabled
+        if interaction.bot.intents.presences:
+            debug_info.append("✅ Presence intent is enabled in the bot")
+        else:
+            debug_info.append("❌ Presence intent is NOT enabled in the bot")
+        
+        # Try to count statuses directly
+        try:
+            # Debug the member object to see if status is accessible
+            if interaction.guild.members:
+                sample_member = next(iter(interaction.guild.members))
+                debug_info.append(f"Sample member status type: {type(sample_member.status)}")
+                debug_info.append(f"Sample member status value: {sample_member.status}")
             
+            # Count statuses
             for member in interaction.guild.members:
-                if member.status == nextcord.Status.online:
+                status_value = str(member.status)
+                if status_value == "online":
                     online += 1
-                elif member.status == nextcord.Status.idle:
+                elif status_value == "idle":
                     idle += 1
-                elif member.status == nextcord.Status.dnd:
+                elif status_value == "dnd":
                     dnd += 1
-                else:
+                elif status_value == "offline":
                     offline += 1
+                else:
+                    debug_info.append(f"Unknown status: {status_value}")
+            
+            debug_info.append(f"Count results: online={online}, idle={idle}, dnd={dnd}, offline={offline}")
             
             status_info = f"🟢 Online: {online}\n🟡 Idle: {idle}\n🔴 DND: {dnd}\n⚫ Offline: {offline}"
             embed.add_field(name="📊 Status Breakdown", value=status_info, inline=False)
             
-            if interaction.bot.intents.presences:
-                embed.set_footer(text=f"Requested by {interaction.user}", icon_url=interaction.user.avatar.url)
-            else:
-                embed.set_footer(text=f"Status counts may be inaccurate - presence intent is disabled | Requested by {interaction.user}", 
-                                icon_url=interaction.user.avatar.url)
-        else:
+            # If counts are suspiciously low, flag it
+            if online + idle + dnd < 3 and count_member > 10:
+                embed.add_field(
+                    name="⚠️ Status Issue Detected", 
+                    value="The count seems unusually low. This may indicate that presence data isn't fully available.",
+                    inline=False
+                )
+                
+        except Exception as e:
+            # If status counting fails, show debug info
             embed.add_field(
-                name="📊 Status Info", 
-                value="⚠️ Status breakdown unavailable - enable presence intents for accurate status counts", 
+                name="⚠️ Status Counting Failed",
+                value=f"Error: {str(e)}",
                 inline=False
             )
-            embed.set_footer(text=f"Requested by {interaction.user}", icon_url=interaction.user.avatar.url)
+        
+        # Always add the debug info in a collapsed field
+        if debug_info:
+            embed.add_field(
+                name="🔍 Debug Information",
+                value="```\n" + "\n".join(debug_info) + "\n```",
+                inline=False
+            )
             
         if interaction.guild.icon:
             embed.set_thumbnail(url=interaction.guild.icon.url)
         
+        embed.set_footer(text=f"Requested by {interaction.user}", icon_url=interaction.user.avatar.url)
         await interaction.response.send_message(embed=embed)
 
 

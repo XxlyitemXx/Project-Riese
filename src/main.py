@@ -16,7 +16,12 @@ intents = nextcord.Intents.default()
 intents.message_content = True
 intents.members = True
 intents.presences = True
-bot = commands.Bot(command_prefix=["?"], intents=intents, help_command=None)
+bot = commands.Bot(
+    command_prefix=["?"], 
+    intents=intents, 
+    help_command=None,
+    chunk_guilds_at_startup=True
+)
 
 
 if webhook_url:
@@ -37,6 +42,12 @@ async def on_ready():
         )
     )
     print("Bot is ready!")
+
+
+@bot.event
+async def on_connect():
+    print(f"Connected to Discord with the following intents: {bot.intents}")
+    print(f"Presence intent enabled: {bot.intents.presences}")
 
 
 bot.load_extension("commands.moderation")
