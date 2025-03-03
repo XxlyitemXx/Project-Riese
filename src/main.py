@@ -44,12 +44,6 @@ async def on_ready():
     print("Bot is ready!")
 
 
-@bot.event
-async def on_connect():
-    print(f"Connected to Discord with the following intents: {bot.intents}")
-    print(f"Presence intent enabled: {bot.intents.presences}")
-
-
 bot.load_extension("commands.moderation")
 bot.load_extension("commands.utility")
 bot.load_extension("commands.role_managements")
