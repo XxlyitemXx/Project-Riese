@@ -206,12 +206,6 @@ class BasicCommands(commands.Cog):
         # Add debug info
         debug_info = []
         
-        # Check if presences intent is enabled
-        if interaction.bot.intents.presences:
-            debug_info.append("✅ Presence intent is enabled in the bot")
-        else:
-            debug_info.append("❌ Presence intent is NOT enabled in the bot")
-        
         # Try to count statuses directly
         try:
             # Debug the member object to see if status is accessible
