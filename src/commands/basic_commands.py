@@ -2,6 +2,7 @@ import nextcord
 from nextcord.ext import commands
 from nextcord import slash_command
 from assets.utils.config_loader import load_config
+import datetime
 config = load_config()
 
 class BasicCommands(commands.Cog):
@@ -202,60 +203,55 @@ class BasicCommands(commands.Cog):
         idle = 0
         dnd = 0
         offline = 0
+        invisible = 0  # Track invisible separately
         
-        # Add debug info
-        debug_info = []
-        
-        # Try to count statuses directly
         try:
-            # Debug the member object to see if status is accessible
-            if interaction.guild.members:
-                sample_member = next(iter(interaction.guild.members))
-                debug_info.append(f"Sample member status type: {type(sample_member.status)}")
-                debug_info.append(f"Sample member status value: {sample_member.status}")
-            
             # Count statuses
             for member in interaction.guild.members:
-                status_value = str(member.status)
-                if status_value == "online":
+                status = member.status
+                if status == nextcord.Status.online:
                     online += 1
-                elif status_value == "idle":
+                elif status == nextcord.Status.idle:
                     idle += 1
-                elif status_value == "dnd":
+                elif status == nextcord.Status.dnd:
                     dnd += 1
-                elif status_value == "offline":
+                elif status == nextcord.Status.invisible:
+                    invisible += 1
+                elif status == nextcord.Status.offline:
                     offline += 1
-                else:
-                    debug_info.append(f"Unknown status: {status_value}")
             
-            debug_info.append(f"Count results: online={online}, idle={idle}, dnd={dnd}, offline={offline}")
+            # Combine offline and invisible for display
+            total_offline = offline + invisible
             
-            status_info = f"🟢 Online: {online}\n🟡 Idle: {idle}\n🔴 DND: {dnd}\n⚫ Offline: {offline}"
+            # Create status breakdown
+            status_lines = [
+                f"🟢 Online: {online}",
+                f"🟡 Idle: {idle}",
+                f"🔴 DND: {dnd}",
+                f"⚫ Offline/Invisible: {total_offline}"
+            ]
+            
+            # Add total active users
+            active_users = online + idle + dnd
+            status_lines.append(f"\n👥 Total Active: {active_users}")
+            
+            status_info = "\n".join(status_lines)
             embed.add_field(name="📊 Status Breakdown", value=status_info, inline=False)
             
-            # If counts are suspiciously low, flag it
-            if online + idle + dnd < 3 and count_member > 10:
-                embed.add_field(
-                    name="⚠️ Status Issue Detected", 
-                    value="The count seems unusually low. This may indicate that presence data isn't fully available.",
-                    inline=False
-                )
-                
+            # Add last updated timestamp
+            embed.add_field(
+                name="🕒 Last Updated",
+                value=f"<t:{int(datetime.datetime.now().timestamp())}:R>",
+                inline=False
+            )
+            
         except Exception as e:
-            # If status counting fails, show debug info
             embed.add_field(
-                name="⚠️ Status Counting Failed",
-                value=f"Error: {str(e)}",
+                name="⚠️ Error",
+                value="Could not fetch complete status information.",
                 inline=False
             )
-        
-        # Always add the debug info in a collapsed field
-        if debug_info:
-            embed.add_field(
-                name="🔍 Debug Information",
-                value="```\n" + "\n".join(debug_info) + "\n```",
-                inline=False
-            )
+            print(f"Status counting error: {e}")
             
         if interaction.guild.icon:
             embed.set_thumbnail(url=interaction.guild.icon.url)
