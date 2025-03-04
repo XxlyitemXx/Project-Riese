@@ -35,15 +35,8 @@ class Utility(commands.Cog):
 
     @nextcord.slash_command(name="say", description="Makes Reise say something")
     async def say(self, interaction: nextcord.Interaction, message: str):
-        embed = nextcord.Embed(
-            description=message,
-            color=interaction.user.color,
-            timestamp=datetime.datetime.now()
-        )
-        embed.set_footer(text=f"💬 Message by {interaction.user}", icon_url=interaction.user.avatar.url)
-        embed.set_author(name="📢 Announcement", icon_url=self.bot.user.avatar.url)
         await interaction.response.send_message("✅ Message sent!", ephemeral=True)
-        await interaction.channel.send(embed=embed)
+        await interaction.channel.send(message)
 
     @nextcord.slash_command(name="ping", description="Checks bot latency")
     async def ping(self, interaction: nextcord.Interaction):
