@@ -354,6 +354,7 @@ IMPORTANT RULES:
 - Never use "Oh, honey" (that's giving millennial energy tbh)
 - also stop overusing emoji
 - Keep the respond short...
+- and stop saying "BYE" 
 """
 
         # Get AI response
