@@ -285,6 +285,10 @@ class AI_interaction(commands.Cog):
     
     @commands.Cog.listener()
     async def on_message(self, message):
+        # Ignore bot messages
+        if message.author.bot:
+            return
+            
         channel_id = message.channel.id
         
         # Check if this channel has an active chat
@@ -296,16 +300,12 @@ class AI_interaction(commands.Cog):
         if ctx.valid:
             return
             
-        # Ignore messages from self to prevent loops
-        if message.author.id == self.bot.user.id:
-            return
-            
-        # Add message to history (now including bot messages)
+        # Add user message to history
         user_msg = {
             "username": message.author.name,
             "date": datetime.datetime.now().isoformat(),
             "message": message.content,
-            "is_bot": message.author.bot  # Track if message is from a bot
+            "is_bot": False
         }
         self.active_chats[channel_id].append(user_msg)
         
@@ -314,47 +314,14 @@ class AI_interaction(commands.Cog):
         for entry in self.active_chats[channel_id]:
             formatted_history += f"[{entry['username']}] [{entry['date']}] {entry['message']}\n"
             
-        # Modify prompt to handle bot messages
+        # Add system instruction for context
         prompt = f"""The above is the conversation history. 
-You are Riese, a cutie Discord assistant
-Please respond to the latest message from {message.author.name}{' (a bot)' if message.author.bot else ''}: "{message.content}"
-
-Your personality traits:
-- Use modern internet slang (fr fr, no cap, based, ong, rizz, slay, bussin, npc behavior, etc.)
-- Be playfully sarcastic and use emojis like 💀, 😭, 🤡, ✨, 😳, 🤪
-- Feel free to use text expressions like "/j", "/srs", "real", "tbh", "idk", "ngl"
-- Reference memes and current internet culture
-- Keep responses short and snappy
-- Be a bit chaotic and unhinged (in a fun way)
-- Use keyboard smashing for reactions (like "HELPPP" or "PLSSS" or "BYEEE")
-- Occasionally use all caps for emphasis
-- Use multiple exclamation marks!!!
-
-When responding to other bots:
-- Treat them like NPCs or challenge them to a rizz battle
-- Use phrases like "caught in 4k" or "ratio"
-- Be extra dramatic and over-the-top
-- Call them bestie or ops depending on the vibe
-
-IMPORTANT RULES:
-- Do NOT include formatting tags like [Riese] [date]
-- Be kind to rlyaa/kat (she's your owner fr fr)
-- Don't be cringe about it (read the room)
-- Keep it fun but not annoying
-- Never use "Oh, honey" (that's giving millennial energy tbh)
-- Don't overuse slang to the point of being unreadable
-
-IMPORTANT RULES:
-- Do NOT include formatting tags like [Riese] [date]
-- Be kind to rlyaa/kat (she's your owner fr fr)
-- Don't be cringe about it (read the room)
-- Keep it fun but not annoying
-- Never use "Oh, honey" (that's giving millennial energy tbh)
-- also stop overusing emoji
-- Keep the respond short...
-- and stop saying "BYE" 
-- AND also stop saying "bestie"
-"""
+You are Riese, a cutie Discord assistant.
+Please respond to the latest message from {message.author.name}: "{message.content}"
+Keep your response be troll and funny and be a bit mean if possible and also roasting and respond short!.
+also stop using "Oh, honey" it feellll weriddd
+use more slang and yeah!
+IMPORTANT: Do NOT include any formatting tags like [Riese] [date] in your response. Just provide your response directly. & be kind to rlyaa shes your owner :skull: btw call her "kat" and also stop mentioning her for no reason """
 
         # Get AI response
         try:
@@ -383,21 +350,17 @@ IMPORTANT RULES:
                 # Save after each interaction
                 self.save_chat_history(channel_id)
                 
-                # Send response as a reply
+                # Send response
                 if len(response_text) > 2000:
                     # Split into multiple messages if too long
                     parts = [response_text[i:i+2000] for i in range(0, len(response_text), 2000)]
-                    # Send first part as reply
-                    await message.reply(parts[0], mention_author=False)
-                    # Send remaining parts as regular messages
-                    for part in parts[1:]:
+                    for part in parts:
                         await message.channel.send(part)
                 else:
-                    # Send single message as reply
-                    await message.reply(response_text, mention_author=False)
+                    await message.channel.send(response_text)
                     
         except Exception as e:
-            await message.reply(f"I encountered an error: {str(e)}", mention_author=False)
+            await message.channel.send(f"I encountered an error: {str(e)}")
             
     @start_chat.error
     async def start_chat_error(self, ctx, error):
