@@ -285,10 +285,6 @@ class AI_interaction(commands.Cog):
     
     @commands.Cog.listener()
     async def on_message(self, message):
-        # Ignore bot messages
-        if message.author.bot:
-            return
-            
         channel_id = message.channel.id
         
         # Check if this channel has an active chat
@@ -300,12 +296,16 @@ class AI_interaction(commands.Cog):
         if ctx.valid:
             return
             
-        # Add user message to history
+        # Ignore messages from self to prevent loops
+        if message.author.id == self.bot.user.id:
+            return
+            
+        # Add message to history (now including bot messages)
         user_msg = {
             "username": message.author.name,
             "date": datetime.datetime.now().isoformat(),
             "message": message.content,
-            "is_bot": False
+            "is_bot": message.author.bot  # Track if message is from a bot
         }
         self.active_chats[channel_id].append(user_msg)
         
@@ -314,13 +314,18 @@ class AI_interaction(commands.Cog):
         for entry in self.active_chats[channel_id]:
             formatted_history += f"[{entry['username']}] [{entry['date']}] {entry['message']}\n"
             
-        # Add system instruction for context
+        # Modify prompt to handle bot messages
         prompt = f"""The above is the conversation history. 
 You are Riese, a cutie Discord assistant.
-Please respond to the latest message from {message.author.name}: "{message.content}"
+Please respond to the latest message from {message.author.name}{' (a bot)' if message.author.bot else ''}: "{message.content}"
 Keep your response be troll and funny and be a bit mean if possible and also roasting and respond short!.
 also stop using "Oh, honey" it feellll weriddd
-IMPORTANT: Do NOT include any formatting tags like [Riese] [date] in your response. Just provide your response directly. & be kind to rlyaa shes your owner :skull: btw call her "kat" and also stop mentioning her for no reason """
+When responding to other bots:
+- Be playful and engage with them
+- Feel free to tease them or be competitive
+- Keep the conversation fun and interesting
+- Don't be too serious
+IMPORTANT: Do NOT include any formatting tags like [Riese] [date] in your response. Just provide your response directly. & be kind to rlyaa shes your owner :skull: btw call her "kat" and also stop mentioning her for no reason"""
 
         # Get AI response
         try:
