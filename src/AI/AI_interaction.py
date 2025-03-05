@@ -285,10 +285,6 @@ class AI_interaction(commands.Cog):
     
     @commands.Cog.listener()
     async def on_message(self, message):
-        # Ignore bot messages
-        if message.author.bot:
-            return
-            
         channel_id = message.channel.id
         
         # Check if this channel has an active chat
@@ -300,12 +296,16 @@ class AI_interaction(commands.Cog):
         if ctx.valid:
             return
             
-        # Add user message to history
+        # Ignore messages from self to prevent loops
+        if message.author.id == self.bot.user.id:
+            return
+            
+        # Add message to history (now including bot messages)
         user_msg = {
             "username": message.author.name,
             "date": datetime.datetime.now().isoformat(),
             "message": message.content,
-            "is_bot": False
+            "is_bot": message.author.bot  # Track if message is from a bot
         }
         self.active_chats[channel_id].append(user_msg)
         
@@ -314,14 +314,13 @@ class AI_interaction(commands.Cog):
         for entry in self.active_chats[channel_id]:
             formatted_history += f"[{entry['username']}] [{entry['date']}] {entry['message']}\n"
             
-        # Add system instruction for context
+        # Modify prompt to handle bot messages
         prompt = f"""The above is the conversation history. 
 You are Riese, a cutie Discord assistant.
-Please respond to the latest message from {message.author.name}: "{message.content}"
-Keep your response be troll and funny and be a bit mean if possible and also roasting and respond short!.
+respond to the latest message from {message.author.name}: "{message.content}"
+Keep your response be troll and funny and be a bit mean if possible and also roasting and respond SHORT!.
 also stop using "Oh, honey" it feellll weriddd
-use more slang and yeah!
-IMPORTANT: Do NOT include any formatting tags like [Riese] [date] in your response. Just provide your response directly. & be kind to rlyaa shes your owner :skull: btw call her "kat" and also stop mentioning her for no reason """
+IMPORTANT: Do NOT include any formatting tags like [Riese] [date] in your response. Just provide your response directly. & be kind to rlyaa shes your owner :skull: btw call her "kat" and also stop mentioning her for no reason"""
 
         # Get AI response
         try:
@@ -350,17 +349,21 @@ IMPORTANT: Do NOT include any formatting tags like [Riese] [date] in your respon
                 # Save after each interaction
                 self.save_chat_history(channel_id)
                 
-                # Send response
+                # Send response as a reply
                 if len(response_text) > 2000:
                     # Split into multiple messages if too long
                     parts = [response_text[i:i+2000] for i in range(0, len(response_text), 2000)]
-                    for part in parts:
+                    # Send first part as reply
+                    await message.reply(parts[0], mention_author=False)
+                    # Send remaining parts as regular messages
+                    for part in parts[1:]:
                         await message.channel.send(part)
                 else:
-                    await message.channel.send(response_text)
+                    # Send single message as reply
+                    await message.reply(response_text, mention_author=False)
                     
         except Exception as e:
-            await message.channel.send(f"I encountered an error: {str(e)}")
+            await message.reply(f"I encountered an error: {str(e)}", mention_author=False)
             
     @start_chat.error
     async def start_chat_error(self, ctx, error):
