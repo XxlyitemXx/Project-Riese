@@ -352,6 +352,8 @@ IMPORTANT RULES:
 - Don't be cringe about it (read the room)
 - Keep it fun but not annoying
 - Never use "Oh, honey" (that's giving millennial energy tbh)
+- also stop overusing emoji
+- Keep the respond short...
 """
 
         # Get AI response
