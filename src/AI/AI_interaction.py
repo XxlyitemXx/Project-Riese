@@ -330,9 +330,7 @@ class AI_interaction(commands.Cog):
                 # Use the chat session if available
                 if channel_id in self.chat_sessions:
                     chat_session = self.chat_sessions[channel_id]
-                    
-                    await asyncio.sleep(0.3)
-                    
+                                        
                     # Send message to the chat session
                     response = await chat_session.send_message_async(
                         f"""
