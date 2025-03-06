@@ -3,6 +3,8 @@ import datetime
 import os
 import json
 from nextcord.ext import commands
+import time
+import asyncio
 
 from google.generativeai.types import HarmCategory, HarmBlockThreshold
 import google.generativeai as genai
@@ -18,13 +20,16 @@ class AI_interaction(commands.Cog):
         config = load_config()
         api_key_gemini = config.get("api_key_gemini")
         genai.configure(api_key=api_key_gemini)
-        # Store active chats (channel_id -> history)
+        
+        # Active chats dictionary
         self.active_chats = {}
+        
         # Directory to store chat history
         self.history_dir = "chat_history"
         if not os.path.exists(self.history_dir):
             os.makedirs(self.history_dir)
             
+        # Keep the existing model configuration
         self.model = genai.GenerativeModel(
             model_name="gemini-2.0-flash-exp",
             generation_config={
@@ -40,8 +45,15 @@ class AI_interaction(commands.Cog):
                 HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_NONE,
                 HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_NONE,
             },
-            system_instruction="""You're Riese , Riese is a discord bot that can answer questions and help user with user's problems""",
+            system_instruction="""You're Riese""",
         )
+        
+        # Store chat sessions
+        self.chat_sessions = {}
+        
+        # Rate limiting
+        self.last_message_time = {}
+        self.MESSAGE_COOLDOWN = 5
 
     @commands.command("ask", description="Ask a question to the AI")
     async def ask(self, ctx, *, question: str):
@@ -191,73 +203,65 @@ class AI_interaction(commands.Cog):
             await ctx.send("A chat is already active in this channel!")
             return
             
-        # Create confirmation embed
-        embed = nextcord.Embed(
-            title="Start AI Chat",
-            description="By starting this chat, you agree that your messages will be stored. The AI will respond to all messages in this channel.",
-            color=0x00FF00,
-            timestamp=datetime.datetime.now()
-        )
-        embed.set_footer(
-            text=f"Requested by {ctx.author.name}",
-            icon_url=ctx.author.avatar.url if ctx.author.avatar else None
-        )
-        
-        # Create confirmation button
-        class ConfirmView(nextcord.ui.View):
-            def __init__(self, cog):
-                super().__init__(timeout=60)
-                self.cog = cog
+        # Create a new chat session
+        try:
+            # Initialize the chat session with the existing model
+            chat_session = self.model.start_chat(history=[])
+            self.chat_sessions[channel_id] = chat_session
+            
+            # Initialize the active chat for backward compatibility
+            self.active_chats[channel_id] = []
+            
+            # Load any existing chat history
+            self.load_chat_history(channel_id)
+            
+            # Create confirmation message
+            embed = nextcord.Embed(
+                title="AI Chat Activated",
+                description="I'll now respond to messages in this channel. Use `?stop_chat` to end the conversation.",
+                color=nextcord.Color.green(),
+            )
+            embed.set_footer(text="Note: This will use your API quota")
+            
+            class ConfirmView(nextcord.ui.View):
+                def __init__(self, cog):
+                    super().__init__(timeout=None)
+                    self.cog = cog
                 
-            @nextcord.ui.button(label="Accept & Start Chat", style=nextcord.ButtonStyle.green)
-            async def confirm(self, button: nextcord.ui.Button, interaction: nextcord.Interaction):
-                if interaction.user.id != ctx.author.id:
-                    await interaction.response.send_message("Only the command initiator can confirm this!", ephemeral=True)
-                    return
-                    
-                # Initialize the chat history
-                self.cog.active_chats[channel_id] = []
-                
-                # Load previous history if exists
-                history_file = f"{self.cog.history_dir}/{channel_id}.json"
-                if os.path.exists(history_file):
-                    try:
-                        with open(history_file, 'r') as f:
-                            self.cog.active_chats[channel_id] = json.load(f)
-                        await interaction.response.send_message("Chat started! I've loaded your previous conversation history.")
-                    except Exception as e:
-                        await interaction.response.send_message(f"Chat started! (Failed to load previous history: {str(e)})")
-                else:
-                    await interaction.response.send_message("Chat started! Send a message to begin our conversation.")
-                
-                # Save initial system message to history
-                system_msg = {
-                    "username": "SYSTEM",
-                    "date": datetime.datetime.now().isoformat(),
-                    "message": "Chat started",
-                    "is_bot": True
-                }
-                self.cog.active_chats[channel_id].append(system_msg)
-                self.cog.save_chat_history(channel_id)
-                
-        await ctx.send(embed=embed, view=ConfirmView(self))
-        
+                @nextcord.ui.button(label="Accept & Start Chat", style=nextcord.ButtonStyle.green)
+                async def confirm(self, button: nextcord.ui.Button, interaction: nextcord.Interaction):
+                    if interaction.user.id == ctx.author.id:
+                        await interaction.response.send_message("Chat activated! I'll respond to messages in this channel now.")
+                        self.stop()
+                    else:
+                        await interaction.response.send_message("Only the person who started the chat can confirm.", ephemeral=True)
+            
+            view = ConfirmView(self)
+            await ctx.send(embed=embed, view=view)
+            
+        except Exception as e:
+            await ctx.send(f"Failed to start chat: {str(e)}")
+
     @commands.command("stop_chat", description="Stop the AI chat in this channel")
     @commands.has_permissions(administrator=True)
     async def stop_chat(self, ctx):
         channel_id = ctx.channel.id
         
-        # Check if chat is active in this channel
-        if channel_id not in self.active_chats:
-            await ctx.send("There's no active chat in this channel!")
-            return
+        if channel_id in self.active_chats:
+            # Save final chat history
+            self.save_chat_history(channel_id)
             
-        # Save final history and deactivate
-        self.save_chat_history(channel_id)
-        del self.active_chats[channel_id]
-        
-        await ctx.send("Chat has been deactivated and history has been saved.")
-        
+            # Remove from active chats
+            del self.active_chats[channel_id]
+            
+            # Remove chat session if it exists
+            if channel_id in self.chat_sessions:
+                del self.chat_sessions[channel_id]
+                
+            await ctx.send("Chat ended. I'll no longer respond to messages in this channel.")
+        else:
+            await ctx.send("There's no active chat in this channel.")
+
     def save_chat_history(self, channel_id):
         """Save chat history to a file"""
         if channel_id not in self.active_chats:
@@ -299,41 +303,60 @@ class AI_interaction(commands.Cog):
         # Ignore messages from self to prevent loops
         if message.author.id == self.bot.user.id:
             return
+        
+        # Rate limiting
+        current_time = time.time()
+        if channel_id in self.last_message_time:
+            time_since_last = current_time - self.last_message_time[channel_id]
+            if time_since_last < self.MESSAGE_COOLDOWN:
+                # Skip this message if we're still in cooldown
+                return
+        
+        # Update last message time
+        self.last_message_time[channel_id] = current_time
             
-        # Add message to history (now including bot messages)
+        # Add message to history for backward compatibility
         user_msg = {
             "username": message.author.name,
             "date": datetime.datetime.now().isoformat(),
             "message": message.content,
-            "is_bot": message.author.bot  # Track if message is from a bot
+            "is_bot": message.author.bot
         }
         self.active_chats[channel_id].append(user_msg)
         
-        # Format the entire conversation for the AI
-        formatted_history = ""
-        for entry in self.active_chats[channel_id]:
-            formatted_history += f"[{entry['username']}] [{entry['date']}] {entry['message']}\n"
-            
-        # Modify prompt to handle bot messages
-        prompt = f"""The above is the conversation history. 
-You are Riese, a cutie Discord assistant.
-respond to the latest message from {message.author.name}: "{message.content}"
-Keep your response be troll and funny and be a bit mean if possible and also roasting and respond SHORT!.
-also stop using "Oh, honey" it feellll weriddd
-also stop over use "OMG"
-IMPORTANT: Do NOT include any formatting tags like [Riese] [date] in your response. Just provide your response directly. & be kind to rlyaa shes your owner :skull: btw call her "kat" and also stop mentioning her for no reason"""
-
-        # Get AI response
         try:
             # Show typing indicator
             async with message.channel.typing():
-                response = self.model.generate_content(formatted_history + "\n" + prompt)
+                # Use the chat session if available
+                if channel_id in self.chat_sessions:
+                    chat_session = self.chat_sessions[channel_id]
+                    
+                    # Add a small delay to help with rate limiting
+                    await asyncio.sleep(1)
+                    
+                    # Send message to the chat session
+                    response = await chat_session.send_message_async(
+                        f"ts pmo sm fr icl sybau. Respond to this message from {message.author.name}: {message.content}"
+                    )
+                    
+                    response_text = response.text
+                else:
+                    # Fallback to the old method if chat session isn't available
+                    formatted_history = ""
+                    for entry in self.active_chats[channel_id]:
+                        formatted_history += f"[{entry['username']}] [{entry['date']}] {entry['message']}\n"
+                        
+                    prompt = f"""The above is the conversation history. 
+                    You are Riese, a cutie Discord assistant.
+                    ts pmo sm fr icl sybau
+                    respond to the latest message from {message.author.name}: "{message.content}"
+                    Keep it short, chaotic, and unhinged"""
+                    
+                    response = self.model.generate_content(formatted_history + "\n" + prompt)
+                    response_text = response.text
                 
-                # Clean response text to remove any format headers if they exist
-                response_text = response.text
-                # Check if response starts with formatting pattern like [Riese] [date]
+                # Clean response text if needed
                 if response_text.startswith("[Riese]") and "[" in response_text[:50]:
-                    # Find the second timestamp bracket and extract everything after it
                     parts = response_text.split("] ", 2)
                     if len(parts) >= 3:
                         response_text = parts[2]
