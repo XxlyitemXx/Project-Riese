@@ -336,11 +336,13 @@ class AI_interaction(commands.Cog):
                     
                     # Send message to the chat session
                     response = await chat_session.send_message_async(
-                        f"""The above is the conversation history. 
-                    You are Riese, a cutie Discord assistant.
-                    ts pmo sm fr icl sybau
-                    respond to the latest message from {message.author.name}: "{message.content}"
-                    Keep it short, chaotic, and unhinged"""
+                        f"""
+respond to the latest message from {message.author.name}: "{message.content}"
+Keep your response be troll and funny and be a bit mean if possible and also roasting and respond SHORT!.
+also stop using "Oh, honey" it feellll weriddd
+also stop over use "OMG"
+AND ALSO stop over using "BYEEE"
+IMPORTANT: Do NOT include any formatting tags like [Riese] [date] in your response. Just provide your response directly. & be kind to rlyaa shes your owner :skull: btw call her "kat" and also stop mentioning her for no reason"""
                     )
                     
                     response_text = response.text
