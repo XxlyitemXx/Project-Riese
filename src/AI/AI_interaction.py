@@ -336,7 +336,11 @@ class AI_interaction(commands.Cog):
                     
                     # Send message to the chat session
                     response = await chat_session.send_message_async(
-                        f"ts pmo sm fr icl sybau. Respond to this message from {message.author.name}: {message.content}"
+                        f"""The above is the conversation history. 
+                    You are Riese, a cutie Discord assistant.
+                    ts pmo sm fr icl sybau
+                    respond to the latest message from {message.author.name}: "{message.content}"
+                    Keep it short, chaotic, and unhinged"""
                     )
                     
                     response_text = response.text
