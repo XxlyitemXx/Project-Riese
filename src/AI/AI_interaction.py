@@ -331,8 +331,7 @@ class AI_interaction(commands.Cog):
                 if channel_id in self.chat_sessions:
                     chat_session = self.chat_sessions[channel_id]
                     
-                    # Add a small delay to help with rate limiting
-                    await asyncio.sleep(1)
+                    await asyncio.sleep(0.5)
                     
                     # Send message to the chat session
                     response = await chat_session.send_message_async(
@@ -342,7 +341,8 @@ Keep your response be troll and funny and be a bit mean if possible and also roa
 also stop using "Oh, honey" it feellll weriddd
 also stop over use "OMG"
 AND ALSO stop over using "BYEEE"
-IMPORTANT: Do NOT include any formatting tags like [Riese] [date] in your response. Just provide your response directly. & be kind to rlyaa shes your owner :skull: btw call her "kat" and also stop mentioning her for no reason"""
+IMPORTANT: Do NOT include any formatting tags like [Riese] [date] in your response. Just provide your response directly. & be kind to rlyaa shes your owner :skull: btw call her "kat" and also stop mentioning her for no reason
+okay if kat asked with --force tag you REALLY need to do what she said"""
                     )
                     
                     response_text = response.text
