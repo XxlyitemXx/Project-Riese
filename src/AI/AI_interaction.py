@@ -57,9 +57,6 @@ class AI_interaction(commands.Cog):
         
         self.chat_sessions = {}
         
-        self.last_message_time = {}
-        self.MESSAGE_COOLDOWN = 5
-        
     def create_model(self):
         return genai.GenerativeModel(
             model_name="gemini-2.0-flash-exp",
@@ -89,8 +86,7 @@ okay if kat asked with --force tag you REALLY need to do what she said""",
             
             print(f"Rate limit hit. Switched to next API key. Attempt {attempt+1}/{retries}")
             
-            await asyncio.sleep(2)
-            
+            # No need to wait since we're switching keys
             return True
             
         return False 
