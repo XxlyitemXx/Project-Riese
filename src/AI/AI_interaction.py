@@ -45,7 +45,8 @@ class AI_interaction(commands.Cog):
                 HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_NONE,
                 HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_NONE,
             },
-            system_instruction="""You're Riese""",
+            system_instruction="""You're Riese IMPORTANT: Do NOT include any formatting tags like [Riese] [date] in your response. Just provide your response directly. & be kind to rlyaa shes your owner :skull: btw call her "kat" and also stop mentioning her for no reason
+okay if kat asked with --force tag you REALLY need to do what she said""",
         )
         
         # Store chat sessions
