@@ -11,9 +11,6 @@ import google.generativeai as genai
 
 from assets.utils.config_loader import load_config
 
-
-
-
 class AI_interaction(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -21,15 +18,12 @@ class AI_interaction(commands.Cog):
         api_key_gemini = config.get("api_key_gemini")
         genai.configure(api_key=api_key_gemini)
         
-        # Active chats dictionary
         self.active_chats = {}
         
-        # Directory to store chat history
         self.history_dir = "chat_history"
         if not os.path.exists(self.history_dir):
             os.makedirs(self.history_dir)
             
-        # Keep the existing model configuration
         self.model = genai.GenerativeModel(
             model_name="gemini-2.0-flash-exp",
             generation_config={
@@ -49,10 +43,8 @@ class AI_interaction(commands.Cog):
 okay if kat asked with --force tag you REALLY need to do what she said""",
         )
         
-        # Store chat sessions
         self.chat_sessions = {}
         
-        # Rate limiting
         self.last_message_time = {}
         self.MESSAGE_COOLDOWN = 5
 
@@ -199,24 +191,18 @@ okay if kat asked with --force tag you REALLY need to do what she said""",
     async def start_chat(self, ctx):
         channel_id = ctx.channel.id
         
-        # Check if chat is already active in this channel
         if channel_id in self.active_chats:
             await ctx.send("A chat is already active in this channel!")
             return
             
-        # Create a new chat session
         try:
-            # Initialize the chat session with the existing model
             chat_session = self.model.start_chat(history=[])
             self.chat_sessions[channel_id] = chat_session
             
-            # Initialize the active chat for backward compatibility
             self.active_chats[channel_id] = []
             
-            # Load any existing chat history
             self.load_chat_history(channel_id)
             
-            # Create confirmation message
             embed = nextcord.Embed(
                 title="AI Chat Activated",
                 description="I'll now respond to messages in this channel. Use `?stop_chat` to end the conversation.",
@@ -249,13 +235,10 @@ okay if kat asked with --force tag you REALLY need to do what she said""",
         channel_id = ctx.channel.id
         
         if channel_id in self.active_chats:
-            # Save final chat history
             self.save_chat_history(channel_id)
             
-            # Remove from active chats
             del self.active_chats[channel_id]
             
-            # Remove chat session if it exists
             if channel_id in self.chat_sessions:
                 del self.chat_sessions[channel_id]
                 
@@ -264,7 +247,6 @@ okay if kat asked with --force tag you REALLY need to do what she said""",
             await ctx.send("There's no active chat in this channel.")
 
     def save_chat_history(self, channel_id):
-        """Save chat history to a file"""
         if channel_id not in self.active_chats:
             return
             
@@ -276,7 +258,6 @@ okay if kat asked with --force tag you REALLY need to do what she said""",
             print(f"Error saving chat history: {str(e)}")
             
     def load_chat_history(self, channel_id):
-        """Load chat history from a file"""
         history_file = f"{self.history_dir}/{channel_id}.json"
         if not os.path.exists(history_file):
             return []
@@ -292,31 +273,16 @@ okay if kat asked with --force tag you REALLY need to do what she said""",
     async def on_message(self, message):
         channel_id = message.channel.id
         
-        # Check if this channel has an active chat
         if channel_id not in self.active_chats:
             return
             
-        # Don't process commands
         ctx = await self.bot.get_context(message)
         if ctx.valid:
             return
             
-        # Ignore messages from self to prevent loops
         if message.author.id == self.bot.user.id:
             return
-        
-        # Rate limiting
-        current_time = time.time()
-        if channel_id in self.last_message_time:
-            time_since_last = current_time - self.last_message_time[channel_id]
-            if time_since_last < self.MESSAGE_COOLDOWN:
-                # Skip this message if we're still in cooldown
-                return
-        
-        # Update last message time
-        self.last_message_time[channel_id] = current_time
             
-        # Add message to history for backward compatibility
         user_msg = {
             "username": message.author.name,
             "date": datetime.datetime.now().isoformat(),
@@ -326,16 +292,21 @@ okay if kat asked with --force tag you REALLY need to do what she said""",
         self.active_chats[channel_id].append(user_msg)
         
         try:
-            # Show typing indicator
             async with message.channel.typing():
-                # Use the chat session if available
+                replied_content = ""
+                if message.reference:
+                    try:
+                        replied_message = await message.channel.fetch_message(message.reference.message_id)
+                        replied_content = f"\nThis message is replying to: {replied_message.content}"
+                    except:
+                        pass
+
                 if channel_id in self.chat_sessions:
                     chat_session = self.chat_sessions[channel_id]
-                                        
-                    # Send message to the chat session
+                    
                     response = await chat_session.send_message_async(
                         f"""
-respond to the latest message from {message.author.name}: "{message.content}"
+respond to the latest message from {message.author.name}: "{message.content}"{replied_content}
 Keep your response be troll and funny and be a bit mean if possible and also roasting and respond SHORT!.
 also stop using "Oh, honey" it feellll weriddd
 also stop over use "OMG"
@@ -346,27 +317,28 @@ okay if kat asked with --force tag you REALLY need to do what she said"""
                     
                     response_text = response.text
                 else:
-                    # Fallback to the old method if chat session isn't available
                     formatted_history = ""
                     for entry in self.active_chats[channel_id]:
                         formatted_history += f"[{entry['username']}] [{entry['date']}] {entry['message']}\n"
                         
                     prompt = f"""The above is the conversation history. 
                     You are Riese, a cutie Discord assistant.
-                    ts pmo sm fr icl sybau
-                    respond to the latest message from {message.author.name}: "{message.content}"
-                    Keep it short, chaotic, and unhinged"""
+                    respond to the latest message from {message.author.name}: "{message.content}"{replied_content}
+                    Keep your response be troll and funny and be a bit mean if possible and also roasting and respond SHORT!.
+                    also stop using "Oh, honey" it feellll weriddd
+                    also stop over use "OMG"
+                    AND ALSO stop over using "BYEEE"
+                    IMPORTANT: Do NOT include any formatting tags like [Riese] [date] in your response. Just provide your response directly. & be kind to rlyaa shes your owner :skull: btw call her "kat" and also stop mentioning her for no reason
+                    okay if kat asked with --force tag you REALLY need to do what she said"""
                     
                     response = self.model.generate_content(formatted_history + "\n" + prompt)
                     response_text = response.text
                 
-                # Clean response text if needed
                 if response_text.startswith("[Riese]") and "[" in response_text[:50]:
                     parts = response_text.split("] ", 2)
                     if len(parts) >= 3:
                         response_text = parts[2]
                 
-                # Add AI response to history
                 bot_msg = {
                     "username": "Riese",
                     "date": datetime.datetime.now().isoformat(),
@@ -375,20 +347,14 @@ okay if kat asked with --force tag you REALLY need to do what she said"""
                 }
                 self.active_chats[channel_id].append(bot_msg)
                 
-                # Save after each interaction
                 self.save_chat_history(channel_id)
                 
-                # Send response as a reply
                 if len(response_text) > 2000:
-                    # Split into multiple messages if too long
                     parts = [response_text[i:i+2000] for i in range(0, len(response_text), 2000)]
-                    # Send first part as reply
                     await message.reply(parts[0], mention_author=False)
-                    # Send remaining parts as regular messages
                     for part in parts[1:]:
                         await message.channel.send(part)
                 else:
-                    # Send single message as reply
                     await message.reply(response_text, mention_author=False)
                     
         except Exception as e:
