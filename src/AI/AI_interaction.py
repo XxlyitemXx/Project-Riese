@@ -331,6 +331,9 @@ okay if kat asked with --force tag you REALLY need to do what she said""",
     
     @commands.Cog.listener()
     async def on_message(self, message):
+        if message.author.bot:
+            return
+        
         channel_id = message.channel.id
         
         if channel_id not in self.active_chats:
@@ -339,10 +342,10 @@ okay if kat asked with --force tag you REALLY need to do what she said""",
         ctx = await self.bot.get_context(message)
         if ctx.valid:
             return
-            
+        
         if message.author.id == self.bot.user.id:
             return
-            
+
         user_msg = {
             "username": message.author.name,
             "date": datetime.datetime.now().isoformat(),
