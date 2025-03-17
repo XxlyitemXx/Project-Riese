@@ -333,6 +333,8 @@ okay if kat asked with --force tag you REALLY need to do what she said""",
     async def on_message(self, message):
         if message.author.bot:
             return
+        if "--ignore" in message.content:
+            return
         
         channel_id = message.channel.id
         
