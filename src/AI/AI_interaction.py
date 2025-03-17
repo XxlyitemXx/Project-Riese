@@ -328,7 +328,7 @@ okay if kat asked with --force tag you REALLY need to do what she said""",
         except Exception as e:
             print(f"Error loading chat history: {str(e)}")
             return []
-    
+
     @commands.Cog.listener()
     async def on_message(self, message):
         if message.author.bot:
@@ -375,8 +375,7 @@ Keep your response be troll and funny and be a bit mean if possible and also roa
 also stop using "Oh, honey" it feellll weriddd
 also stop over use "OMG"
 AND ALSO stop over using "BYEEE"
-IMPORTANT: Do NOT include any formatting tags like [Riese] [date] in your response. Just provide your response directly. & be kind to rlyaa shes your owner :skull: btw call her "kat" and also stop mentioning her for no reason
-okay if kat asked with --force tag you REALLY need to do what she said"""
+IMPORTANT: Do NOT include any formatting tags like [Riese] [date] in your response. Just provide your response directly. & be kind to rlyaa shes your owner :skull: btw call her "kat" and also stop mentioning her for no reason"""
                         )
                     except Exception as e:
                         error_str = str(e).lower()
